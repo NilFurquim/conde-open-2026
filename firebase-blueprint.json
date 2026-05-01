@@ -1,0 +1,67 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "App user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "player", "guest"] },
+        "whatsapp": { "type": "string", "description": "WhatsApp contact number" }
+      },
+      "required": ["uid", "email", "role"]
+    },
+    "Match": {
+      "title": "Match",
+      "description": "A tennis match in the tournament",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "category": { "type": "string", "enum": ["A", "B", "C", "Duplas"] },
+        "round": { "type": "string" },
+        "group": { "type": "string" },
+        "participants": { "type": "array", "description": "Array of user IDs or team descriptions" },
+        "p1": { "type": "object", "description": "Player 1 data" },
+        "p2": { "type": "object", "description": "Player 2 data" },
+        "score1": { "type": "array", "items": { "type": "integer" } },
+        "score2": { "type": "array", "items": { "type": "integer" } },
+        "tiebreak1": { "type": "integer" },
+        "tiebreak2": { "type": "integer" },
+        "winnerId": { "type": "string" },
+        "scheduledAt": { "type": "string", "format": "date-time" },
+        "court": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "scheduled", "completed"] },
+        "deadline": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string" }
+      },
+      "required": ["category", "round", "status"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "description": "Global tournament settings",
+      "type": "object",
+      "properties": {
+        "currentRoundDeadline": { "type": "string", "format": "date-time" },
+        "adminEmails": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/matches/{matchId}": {
+      "schema": "Match",
+      "description": "Tournament matches"
+    },
+    "/settings/global": {
+      "schema": "Settings",
+      "description": "Global config"
+    }
+  }
+}

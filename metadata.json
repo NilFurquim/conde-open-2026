@@ -1,0 +1,6 @@
+{
+  "name": "Tennis Tournament Manager",
+  "description": "Mobile-first tennis tournament management system with real-time scheduling, results, and brackets for multiple categories.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

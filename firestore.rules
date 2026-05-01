@@ -1,0 +1,9 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default allow all for this simplified tournament app as requested
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

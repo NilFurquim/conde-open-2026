@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Lexend", serif;
+  --font-lexend: "Lexend", sans-serif;
+  
+  --color-primary: #406900;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #a2ff00;
+  --color-on-primary-container: #467200;
+  
+  --color-secondary: #476083;
+  --color-on-secondary: #ffffff;
+  
+  --color-surface: #fcf9f8;
+  --color-on-surface: #1c1b1b;
+  --color-border-muted: #e5e2e1;
+  --color-navy-900: #001f3f; /* Using the specific hex from brand text */
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-on-surface font-sans antialiased;
+  }
+  
+  h1, h2, h3, .font-serif {
+    @apply font-lexend font-bold tracking-tight;
+  }
+}
