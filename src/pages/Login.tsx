@@ -1,45 +1,48 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Search, User, ShieldCheck, Trophy, ChevronRight } from 'lucide-react';
-import { CATEGORY_A_PLAYERS, CATEGORY_B_GROUPS, CATEGORY_C_GROUPS } from '../constants/tournamentData';
+import { Search, ChevronRight, Eye, Phone, Trophy } from 'lucide-react';
+import { getAllPlayers } from '../constants/tournamentData';
+
+type Step = 'select' | 'whatsapp';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const { loginAsPlayer, setGuestMode } = useAuth();
+  const [step, setStep] = useState<Step>('select');
   const [searchTerm, setSearchTerm] = useState('');
-  const [loadingPlayer, setLoadingPlayer] = useState<string | null>(null);
+  const [selectedName, setSelectedName] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Flatten all players into one list
-  const allPlayers = useMemo(() => {
-    const players = new Set<string>();
-    CATEGORY_A_PLAYERS.forEach(p => players.add(p));
-    Object.values(CATEGORY_B_GROUPS).forEach(pList => pList.forEach(p => players.add(p)));
-    Object.values(CATEGORY_C_GROUPS).forEach(pList => pList.forEach(p => players.add(p)));
-    
-    // Add explicitly known admin or specific names from screenshots
-    players.add('Organizador');
-    
-    return Array.from(players).sort();
-  }, []);
+  const allPlayers = useMemo(() => getAllPlayers(), []);
 
   const filteredPlayers = useMemo(() => {
-    if (!searchTerm) return allPlayers.slice(0, 10); // Show first 10 initially
-    return allPlayers.filter(p => 
-      p.toLowerCase().includes(searchTerm.toLowerCase())
-    ).slice(0, 10);
+    const term = searchTerm.toLowerCase();
+    if (!term) return allPlayers.slice(0, 12);
+    return allPlayers
+      .filter(p => p.toLowerCase().includes(term))
+      .slice(0, 12);
   }, [searchTerm, allPlayers]);
 
-  const handleSelectPlayer = async (name: string) => {
-    setLoadingPlayer(name);
+  const handleSelectPlayer = (name: string) => {
+    setSelectedName(name);
+    if (name === 'Organizador') {
+      handleLogin(name, undefined);
+    } else {
+      setStep('whatsapp');
+    }
+  };
+
+  const handleLogin = async (name: string, phone: string | undefined) => {
+    setLoading(true);
     try {
-      const isAdmin = name === 'Organizador';
-      await loginAsPlayer(name, isAdmin);
+      await loginAsPlayer(name, phone && phone.trim() ? phone.trim() : undefined);
       navigate('/');
-    } catch (e) {
-      alert('Erro ao entrar no perfil.');
+    } catch {
+      alert('Erro ao entrar. Tente novamente.');
     } finally {
-      setLoadingPlayer(null);
+      setLoading(false);
     }
   };
 
@@ -48,96 +51,133 @@ const Login: React.FC = () => {
     navigate('/');
   };
 
+  if (step === 'whatsapp') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col p-6 font-sans">
+        <div className="mt-12 mb-8">
+          <button
+            onClick={() => setStep('select')}
+            className="text-secondary text-sm mb-6 flex items-center gap-1"
+          >
+            ← Voltar
+          </button>
+          <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mb-4">
+            <span className="text-2xl font-bold text-on-primary-container">
+              {selectedName.charAt(0).toUpperCase()}
+            </span>
+          </div>
+          <h1 className="font-lexend font-bold text-2xl text-navy-900">Olá, {selectedName}!</h1>
+          <p className="text-secondary text-sm mt-1">Seu número de WhatsApp (opcional)</p>
+        </div>
+
+        <div className="space-y-4 flex-1">
+          <div className="bg-white rounded-2xl border border-border-muted p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <Phone className="w-5 h-5 text-secondary" />
+              <span className="font-semibold text-sm text-navy-900">WhatsApp para contato</span>
+            </div>
+            <p className="text-xs text-secondary mb-3">
+              Outros jogadores poderão te contactar para agendar partidas.
+            </p>
+            <div className="flex items-center gap-2 bg-slate-50 rounded-xl border border-border-muted px-3">
+              <span className="text-sm text-secondary font-mono">+55</span>
+              <input
+                type="tel"
+                value={whatsapp}
+                onChange={e => setWhatsapp(e.target.value.replace(/\D/g, ''))}
+                placeholder="11987654321"
+                className="flex-1 bg-transparent py-3 text-sm outline-none font-mono"
+                maxLength={11}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={() => handleLogin(selectedName, whatsapp)}
+            disabled={loading}
+            className="w-full bg-navy-900 text-primary-container py-4 rounded-2xl font-lexend font-bold text-sm uppercase tracking-widest disabled:opacity-50 flex items-center justify-center gap-2"
+          >
+            {loading ? 'Entrando...' : 'Entrar no Torneio'}
+            {!loading && <ChevronRight className="w-4 h-4" />}
+          </button>
+
+          <button
+            onClick={() => handleLogin(selectedName, undefined)}
+            className="w-full text-secondary py-2 text-sm"
+          >
+            Pular e entrar sem WhatsApp
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col p-6 font-sans">
       {/* Header */}
-      <header className="flex flex-col items-center justify-center mt-12 mb-10 space-y-4">
-        <div className="w-16 h-16 bg-navy-900 rounded-3xl flex items-center justify-center shadow-xl shadow-navy-900/20 rotate-[-4deg]">
-          <Trophy className="w-8 h-8 text-primary" />
+      <div className="mt-10 mb-8 text-center">
+        <div className="w-16 h-16 bg-primary-container rounded-full flex items-center justify-center mx-auto mb-4">
+          <Trophy className="w-8 h-8 text-on-primary-container" />
         </div>
-        <h1 className="font-lexend font-black text-3xl text-navy-900 tracking-tight uppercase">
-          Conde Open <span className="text-primary italic">2026</span>
-        </h1>
-      </header>
-
-      <div className="mx-auto w-full max-w-sm space-y-10">
-        
-        {/* Guest Button Section */}
-        <section className="space-y-3">
-          <button 
-            onClick={handleGuestLogin}
-            className="w-full bg-primary text-navy-900 font-lexend font-bold py-5 px-6 rounded-2xl flex items-center justify-between active:scale-[0.98] transition-all shadow-lg hover:shadow-xl shadow-primary/20 group"
-          >
-            <div className="flex items-center gap-3">
-              <div className="bg-navy-900/10 p-2 rounded-xl">
-                <User className="w-5 h-5 text-navy-900" />
-              </div>
-              <span className="text-sm tracking-widest uppercase">Acessar Como Convidado</span>
-            </div>
-            <ChevronRight className="w-5 h-5 text-navy-900 opacity-50 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <p className="text-center text-slate-400 text-xs font-medium px-4">
-            Acesso rápido para visualização de chaves e resultados.
-          </p>
-        </section>
-
-        <div className="flex items-center gap-4">
-          <div className="h-px bg-slate-200 flex-1"></div>
-          <span className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Ou acesse seu perfil</span>
-          <div className="h-px bg-slate-200 flex-1"></div>
-        </div>
-
-        {/* Player Section */}
-        <section className="space-y-6">
-          <div className="space-y-1 text-center">
-            <h2 className="font-lexend font-black text-2xl text-navy-900 tracking-tight">Sou Jogador</h2>
-            <p className="text-slate-400 text-sm">Selecione seu nome para gerenciar seus jogos.</p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative group">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5 group-focus-within:text-primary transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Buscar nome..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full bg-white border border-slate-200 rounded-2xl py-4 pl-12 pr-6 font-lexend text-sm placeholder:text-slate-400 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
-            />
-          </div>
-
-          {/* Player Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {filteredPlayers.map(player => (
-              <button
-                key={player}
-                onClick={() => handleSelectPlayer(player)}
-                disabled={!!loadingPlayer}
-                className={`bg-white border border-slate-200 rounded-2xl p-5 flex flex-col items-center gap-3 active:scale-95 transition-all shadow-sm hover:shadow-md hover:border-primary group ${loadingPlayer === player ? 'opacity-50' : ''}`}
-              >
-                <div className="relative">
-                  <div className="w-16 h-16 rounded-full bg-slate-100 overflow-hidden border-2 border-white shadow-sm group-hover:border-primary/20 transition-colors">
-                    <img 
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${player}&backgroundColor=f1f5f9`} 
-                      alt={player}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  {player === 'Organizador' && (
-                    <div className="absolute -bottom-1 -right-1 bg-navy-900 text-primary p-1 rounded-full shadow-md">
-                      <ShieldCheck size={12} />
-                    </div>
-                  )}
-                </div>
-                <span className="font-lexend font-bold text-sm text-slate-700 tracking-tight group-hover:text-navy-900 transition-colors truncate w-full text-center">
-                  {player}
-                </span>
-              </button>
-            ))}
-          </div>
-        </section>
+        <h1 className="font-lexend font-bold text-2xl text-navy-900">Conde Open 2026</h1>
+        <p className="text-secondary text-sm mt-1">Selecione seu nome para entrar</p>
       </div>
 
+      {/* Search */}
+      <div className="flex items-center gap-3 bg-white rounded-2xl border border-border-muted px-4 mb-4 shadow-sm">
+        <Search className="w-5 h-5 text-secondary shrink-0" />
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Buscar seu nome..."
+          className="flex-1 py-3.5 text-sm outline-none bg-transparent"
+          autoFocus
+        />
+      </div>
+
+      {/* Player list */}
+      <div className="flex-1 space-y-2 overflow-y-auto">
+        {filteredPlayers.map(name => (
+          <button
+            key={name}
+            onClick={() => handleSelectPlayer(name)}
+            className="w-full flex items-center justify-between bg-white border border-border-muted rounded-2xl px-4 py-3.5 active:bg-slate-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container font-bold text-sm shrink-0">
+                {name.charAt(0).toUpperCase()}
+              </div>
+              <span className="font-semibold text-navy-900 text-sm">{name}</span>
+            </div>
+            <ChevronRight className="w-4 h-4 text-secondary" />
+          </button>
+        ))}
+
+        {filteredPlayers.length === 0 && (
+          <div className="text-center py-8 text-secondary text-sm">
+            Nenhum jogador encontrado para "{searchTerm}"
+          </div>
+        )}
+
+        {/* Admin option */}
+        <button
+          onClick={() => handleSelectPlayer('Organizador')}
+          className="w-full flex items-center justify-between bg-navy-900 rounded-2xl px-4 py-3.5 mt-4"
+        >
+          <span className="font-semibold text-primary-container text-sm">Organizador (Admin)</span>
+          <ChevronRight className="w-4 h-4 text-primary-container" />
+        </button>
+
+        {/* Guest */}
+        <button
+          onClick={handleGuestLogin}
+          className="w-full flex items-center justify-center gap-2 border border-border-muted rounded-2xl px-4 py-3.5 text-secondary text-sm"
+        >
+          <Eye className="w-4 h-4" />
+          Entrar como convidado (só visualizar)
+        </button>
+      </div>
     </div>
   );
 };

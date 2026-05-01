@@ -9,10 +9,10 @@ import Rules from './pages/Rules';
 import MatchDetail from './pages/MatchDetail';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, loading, isGuest } = useAuth();
+  const { profile, loading, isGuest } = useAuth();
 
-  if (loading) return <div className="flex items-center justify-center min-h-screen">Carregando...</div>;
-  if (!user && !isGuest) return <Navigate to="/login" />;
+  if (loading) return <div className="flex items-center justify-center min-h-screen bg-slate-50 text-secondary text-sm">Carregando...</div>;
+  if (!profile && !isGuest) return <Navigate to="/login" />;
 
   return <>{children}</>;
 };
