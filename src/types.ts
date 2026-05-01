@@ -8,12 +8,11 @@ export enum UserRole {
 
 export interface UserProfile {
   uid: string;
-  email: string;
   displayName: string;
   photoURL?: string;
   role: UserRole;
+  playerName: string;
   whatsapp?: string;
-  playerName?: string; // Link to a static player name
 }
 
 export enum MatchStatus {
@@ -22,12 +21,28 @@ export enum MatchStatus {
   COMPLETED = 'completed'
 }
 
+export interface MatchEdit {
+  timestamp: Timestamp;
+  updatedBy: string;
+  score1?: number[];
+  score2?: number[];
+  tiebreak1?: number;
+  tiebreak2?: number;
+  winner?: string;
+  scheduledAt?: Timestamp;
+  court?: string;
+  action: 'schedule' | 'result';
+}
+
+export type Category = 'A' | 'B' | 'C' | 'Duplas';
+
 export interface Match {
   id: string;
-  category: string;
+  category: Category;
   round: string;
   group?: string;
-  p1: string; // Player name or Team name
+  matchNum?: number;
+  p1: string;
   p2: string;
   score1?: number[];
   score2?: number[];
@@ -39,10 +54,25 @@ export interface Match {
   court?: string;
   deadline?: Timestamp;
   updatedBy?: string;
-  participants: string[]; // List of player names involved
+  updatedAt?: Timestamp;
+  participants: string[];
+  history?: MatchEdit[];
+}
+
+export interface GroupStanding {
+  player: string;
+  group: string;
+  category: Category;
+  wins: number;
+  losses: number;
+  points: number;
+  setsWon: number;
+  setsLost: number;
+  gamesWon: number;
+  gamesLost: number;
+  matchesPlayed: number;
 }
 
 export interface TournamentSettings {
-  currentRoundDeadline: Timestamp;
-  adminEmails: string[];
+  roundDeadlines?: Record<string, Timestamp>;
 }

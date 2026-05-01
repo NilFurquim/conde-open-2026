@@ -1,14 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { UserProfile, UserRole } from '../types';
+import { savePlayerContact } from '../lib/matchService';
 
 interface AuthContextType {
-  user: any | null; // Keeping signature for compatibility
+  user: null;
   profile: UserProfile | null;
   loading: boolean;
   isGuest: boolean;
   isAdmin: boolean;
-  loginAsPlayer: (playerName: string, isAdmin?: boolean) => Promise<void>;
+  loginAsPlayer: (playerName: string, whatsapp?: string) => Promise<void>;
   setGuestMode: (val: boolean) => void;
+  updateWhatsapp: (whatsapp: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -20,6 +22,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   loginAsPlayer: async () => {},
   setGuestMode: () => {},
+  updateWhatsapp: async () => {},
   logout: async () => {},
 });
 
@@ -29,46 +32,45 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    // Load from local storage
     const storedProfile = localStorage.getItem('tennis_profile');
     const storedGuest = localStorage.getItem('tennis_guest');
-    
     if (storedProfile) {
-      setProfile(JSON.parse(storedProfile));
+      try { setProfile(JSON.parse(storedProfile)); } catch {}
     }
-    
-    if (storedGuest === 'true') {
-      setIsGuest(true);
-    }
-    
+    if (storedGuest === 'true') setIsGuest(true);
     setLoading(false);
   }, []);
 
-  const loginAsPlayer = async (playerName: string, isAdminRole: boolean = false) => {
+  const loginAsPlayer = async (playerName: string, whatsapp?: string) => {
     setLoading(true);
     try {
-      // Create a mock uid based on name
-      const uid = playerName.toLowerCase().replace(/\s+/g, '-');
-      
+      const isAdminRole = playerName === 'Organizador';
       const newProfile: UserProfile = {
-        uid: uid,
-        email: '',
+        uid: playerName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         displayName: playerName,
-        photoURL: `https://api.dicebear.com/7.x/avataaars/svg?seed=${playerName}&backgroundColor=f1f5f9`,
+        photoURL: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(playerName)}&backgroundColor=406900&textColor=ffffff`,
         role: isAdminRole ? UserRole.ADMIN : UserRole.PLAYER,
-        playerName: playerName
+        playerName,
+        whatsapp: whatsapp || undefined,
       };
-
       setProfile(newProfile);
       setIsGuest(false);
       localStorage.setItem('tennis_profile', JSON.stringify(newProfile));
       localStorage.removeItem('tennis_guest');
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      if (whatsapp && !isAdminRole) {
+        await savePlayerContact(playerName, whatsapp).catch(() => {});
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateWhatsapp = async (whatsapp: string) => {
+    if (!profile) return;
+    const updated = { ...profile, whatsapp };
+    setProfile(updated);
+    localStorage.setItem('tennis_profile', JSON.stringify(updated));
+    await savePlayerContact(profile.playerName, whatsapp).catch(() => {});
   };
 
   const handleSetGuestMode = (val: boolean) => {
@@ -89,18 +91,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('tennis_guest');
   };
 
-  const isAdmin = profile?.role === UserRole.ADMIN;
-
   return (
-    <AuthContext.Provider value={{ 
-      user: null, 
-      profile, 
-      loading, 
-      isGuest, 
-      isAdmin, 
+    <AuthContext.Provider value={{
+      user: null,
+      profile,
+      loading,
+      isGuest,
+      isAdmin: profile?.role === UserRole.ADMIN,
       loginAsPlayer,
       setGuestMode: handleSetGuestMode,
-      logout
+      updateWhatsapp,
+      logout,
     }}>
       {children}
     </AuthContext.Provider>
