@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllMatches, setKnockoutParticipants } from '../lib/matchService';
-import { computeGroupStandings, getBestThirds } from '../lib/standingsService';
+import { fetchAllMatches } from '../lib/matchService';
+import { computeGroupStandings } from '../lib/standingsService';
 import { Match, MatchStatus, GroupStanding, Category } from '../types';
-import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
-import { Trophy, ChevronRight, CheckCircle2, Shield } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import {
   CATEGORY_A_GROUPS, CATEGORY_B_GROUPS, CATEGORY_C_GROUPS,
   CATEGORY_COLORS, GROUP_COLOR_CLASSES, ROUND_ORDER
@@ -107,105 +106,17 @@ const KOSection: React.FC<{ round: string; matches: Match[]; onMatch: (m: Match)
   </div>
 );
 
-// ── Admin: advance group stage ───────────────────────────────────────────────
-const AdvanceButton: React.FC<{
-  category: Category;
-  allMatches: Match[];
-  onAdvanced: () => void;
-  updatedBy: string;
-}> = ({ category, allMatches, onAdvanced, updatedBy }) => {
-  const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
-
-  const advance = async () => {
-    setLoading(true);
-    try {
-      if (category === 'A') {
-        const groups = CATEGORY_A_GROUPS;
-        const standings: Record<number, GroupStanding[]> = {};
-        Object.entries(groups).forEach(([g, players]) => {
-          standings[Number(g)] = computeGroupStandings(allMatches, players, g, 'A');
-        });
-        const updates: Array<{ id: string; p1: string; p2: string; participants: string[] }> = [
-          { id: 'A-QF-1', p1: standings[1][0].player, p2: standings[2][1].player, participants: [standings[1][0].player, standings[2][1].player] },
-          { id: 'A-QF-2', p1: standings[2][0].player, p2: standings[1][1].player, participants: [standings[2][0].player, standings[1][1].player] },
-          { id: 'A-QF-3', p1: standings[3][0].player, p2: standings[4][1].player, participants: [standings[3][0].player, standings[4][1].player] },
-          { id: 'A-QF-4', p1: standings[4][0].player, p2: standings[3][1].player, participants: [standings[4][0].player, standings[3][1].player] },
-        ];
-        for (const u of updates) await setKnockoutParticipants(u.id, u.p1, u.p2, u.participants, updatedBy);
-      }
-
-      if (category === 'B') {
-        const groups = CATEGORY_B_GROUPS;
-        const standings: Record<number, GroupStanding[]> = {};
-        Object.entries(groups).forEach(([g, players]) => {
-          standings[Number(g)] = computeGroupStandings(allMatches, players, g, 'B');
-        });
-        const thirds = getBestThirds(standings);
-        const t1 = thirds[0]?.player || 'Melhor 3º #1';
-        const t2 = thirds[1]?.player || 'Melhor 3º #2';
-        const t3 = thirds[2]?.player || 'Melhor 3º #3';
-        const t4 = thirds[3]?.player || 'Melhor 3º #4';
-        const g = (n: number, pos: number) => standings[n]?.[pos]?.player || `${pos + 1}º G${n}`;
-        const updates = [
-          { id: 'B-R16-1', p1: g(1, 0), p2: t2, participants: [g(1, 0), t2] },
-          { id: 'B-R16-2', p1: g(2, 0), p2: g(5, 1), participants: [g(2, 0), g(5, 1)] },
-          { id: 'B-R16-3', p1: g(3, 0), p2: t3, participants: [g(3, 0), t3] },
-          { id: 'B-R16-4', p1: g(4, 0), p2: g(1, 1), participants: [g(4, 0), g(1, 1)] },
-          { id: 'B-R16-5', p1: g(5, 0), p2: g(6, 1), participants: [g(5, 0), g(6, 1)] },
-          { id: 'B-R16-6', p1: g(6, 0), p2: t1, participants: [g(6, 0), t1] },
-          { id: 'B-R16-7', p1: g(3, 1), p2: g(2, 1), participants: [g(3, 1), g(2, 1)] },
-          { id: 'B-R16-8', p1: g(4, 1), p2: t4, participants: [g(4, 1), t4] },
-        ];
-        for (const u of updates) await setKnockoutParticipants(u.id, u.p1, u.p2, u.participants, updatedBy);
-      }
-
-      if (category === 'C') {
-        const groups = CATEGORY_C_GROUPS;
-        const s1 = computeGroupStandings(allMatches, groups[1], '1', 'C');
-        const s2 = computeGroupStandings(allMatches, groups[2], '2', 'C');
-        const updates = [
-          { id: 'C-SF-1', p1: s1[0].player, p2: s2[1].player, participants: [s1[0].player, s2[1].player] },
-          { id: 'C-SF-2', p1: s2[0].player, p2: s1[1].player, participants: [s2[0].player, s1[1].player] },
-        ];
-        for (const u of updates) await setKnockoutParticipants(u.id, u.p1, u.p2, u.participants, updatedBy);
-      }
-
-      setDone(true);
-      onAdvanced();
-    } catch (e) {
-      console.error(e);
-      alert('Erro ao avançar fase.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (category === 'Duplas') return null;
-
-  return (
-    <button
-      onClick={advance}
-      disabled={loading || done}
-      className="flex items-center gap-2 bg-navy-900 text-white px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50"
-    >
-      <Shield className="w-3.5 h-3.5" />
-      {done ? 'Fase confirmada!' : loading ? 'Avançando...' : 'Confirmar Classificação'}
-    </button>
-  );
-};
-
 // ── Main Brackets page ──────────────────────────────────────────────────────
 const Brackets: React.FC = () => {
   const navigate = useNavigate();
-  const { isAdmin, profile } = useAuth();
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [catTab, setCatTab] = useState<CatTab>('A');
   const [subTab, setSubTab] = useState<SubTab>('grupos');
 
-  const loadMatches = () => fetchAllMatches().then(setAllMatches).finally(() => setLoading(false));
-  useEffect(() => { loadMatches(); }, []);
+  useEffect(() => {
+    fetchAllMatches().then(setAllMatches).finally(() => setLoading(false));
+  }, []);
 
   const catMatches = useMemo(() => allMatches.filter(m => m.category === catTab), [allMatches, catTab]);
 
@@ -288,14 +199,6 @@ const Brackets: React.FC = () => {
             {/* Groups tab */}
             {(subTab === 'grupos' && !hasDuplas) && (
               <div className="space-y-4">
-                {isAdmin && (
-                  <AdvanceButton
-                    category={catTab}
-                    allMatches={allMatches}
-                    onAdvanced={loadMatches}
-                    updatedBy={profile?.playerName || 'Admin'}
-                  />
-                )}
                 {Object.entries(groupStandings).map(([g, standings]) => (
                   <StandingsTable key={g} standings={standings} groupNum={Number(g)} />
                 ))}

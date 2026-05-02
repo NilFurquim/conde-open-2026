@@ -133,6 +133,7 @@ const MatchDetail: React.FC = () => {
   const deadlinePassed = isDeadlinePassed(match, settings, isAdmin);
   const canEditResult = canEdit && !deadlinePassed;
   const isCompleted = match.status === MatchStatus.COMPLETED;
+  const isEditingExisting = isCompleted && canEditResult;
   const catColor = CATEGORY_COLORS[match.category] || CATEGORY_COLORS.A;
 
   // Opponent's name for WhatsApp
@@ -164,7 +165,15 @@ const MatchDetail: React.FC = () => {
 
     setSavingResult(true);
     try {
-      await saveResult(match.id, score1, score2, undefined, undefined, winner, playerName || 'Admin');
+      await saveResult(
+        match.id,
+        match.category,
+        match.round,
+        score1, score2,
+        undefined, undefined,
+        winner,
+        playerName || 'Admin'
+      );
       await loadMatch();
       setTab('info');
     } catch {
@@ -273,7 +282,7 @@ const MatchDetail: React.FC = () => {
             {[
               { key: 'info', label: 'Info' },
               { key: 'agendar', label: 'Agendar' },
-              ...(canEditResult ? [{ key: 'resultado', label: 'Resultado' }] : []),
+              ...(canEditResult ? [{ key: 'resultado', label: isCompleted ? 'Editar Resultado' : 'Resultado' }] : []),
               { key: 'historico', label: 'Histórico' },
             ].map(t => (
               <button
@@ -342,7 +351,17 @@ const MatchDetail: React.FC = () => {
         {/* Result form */}
         {tab === 'resultado' && canEditResult && (
           <div className="bg-white border border-border-muted rounded-2xl p-5 space-y-4">
-            <h3 className="font-lexend font-bold text-sm text-navy-900">Registrar Resultado</h3>
+            <h3 className="font-lexend font-bold text-sm text-navy-900">
+              {isEditingExisting ? 'Editar Resultado' : 'Registrar Resultado'}
+            </h3>
+            {isEditingExisting && (
+              <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-xs text-amber-800">
+                  Alterar este resultado irá atualizar automaticamente o chaveamento. A próxima partida afetada será reiniciada.
+                </p>
+              </div>
+            )}
             <div className="space-y-2">
               {/* Header */}
               <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center mb-1">
@@ -370,7 +389,7 @@ const MatchDetail: React.FC = () => {
               disabled={savingResult}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest disabled:opacity-50"
             >
-              {savingResult ? 'Salvando...' : 'Salvar Resultado'}
+              {savingResult ? 'Salvando...' : isEditingExisting ? 'Atualizar Resultado' : 'Salvar Resultado'}
             </button>
           </div>
         )}
