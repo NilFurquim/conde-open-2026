@@ -18,7 +18,7 @@ const Layout: React.FC<{ children: React.ReactNode; title: string }> = ({ childr
       <header className="bg-white sticky top-0 z-50 border-b border-border-muted shadow-sm flex justify-between items-center px-4 h-16 w-full">
         <button onClick={handleLogout} className="flex items-center gap-3 active:scale-95 transition-transform text-left">
           <Trophy className="w-5 h-5 text-navy-900" />
-          <h1 className="font-lexend font-bold text-lg tracking-tight text-navy-900">{title === 'Início' && !isGuest && profile ? profile.playerName : title}</h1>
+          <h1 className="font-lexend font-bold text-lg tracking-tight text-navy-900">{title}</h1>
         </button>
         <button onClick={handleLogout} className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary active:scale-95 transition-transform">
           {profile ? (

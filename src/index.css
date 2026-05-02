@@ -14,11 +14,20 @@
   --color-secondary: #476083;
   --color-on-secondary: #ffffff;
   
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
   --color-surface: #fcf9f8;
   --color-on-surface: #1c1b1b;
+  --color-on-surface-variant: #414a34;
+  --color-surface-container-low: #f6f3f2;
   --color-border-muted: #e5e2e1;
-  --color-navy-900: #001f3f; /* Using the specific hex from brand text */
+  --color-navy-900: #001c3a;
 }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 @layer base {
   body {
