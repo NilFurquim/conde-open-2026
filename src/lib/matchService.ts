@@ -16,25 +16,25 @@ import {
 
 export const fetchAllMatches = async (): Promise<Match[]> => {
   const snap = await getDocs(collection(db, 'matches'));
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Match));
+  return snap.docs.map(d => ({ ...d.data(), id: d.id } as Match));
 };
 
 export const fetchMatchesByCategory = async (category: string): Promise<Match[]> => {
   const q = query(collection(db, 'matches'), where('category', '==', category));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Match));
+  return snap.docs.map(d => ({ ...d.data(), id: d.id } as Match));
 };
 
 export const fetchMatchesByPlayer = async (playerName: string): Promise<Match[]> => {
   const q = query(collection(db, 'matches'), where('participants', 'array-contains', playerName));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as Match));
+  return snap.docs.map(d => ({ ...d.data(), id: d.id } as Match));
 };
 
 export const fetchMatchById = async (id: string): Promise<Match | null> => {
   const snap = await getDoc(doc(db, 'matches', id));
   if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() } as Match;
+  return { ...snap.data(), id: snap.id } as Match;
 };
 
 // ─── Scheduling ───────────────────────────────────────────────────────────────
@@ -170,7 +170,7 @@ const checkAndAdvanceGroupStage = async (
     });
     const thirds = getBestThirds(standings);
     const t = (i: number) => thirds[i]?.player ?? `Melhor 3º #${i + 1}`;
-    const g = (n: number, pos: number) => standings[n]?.[pos]?.player ?? `${pos + 1}º G${n}`;
+    const g = (n: number, pos: number) => standings[n]?.[pos]?.player ?? `${pos + 1}º Grupo ${n}`;
     const updates = [
       { id: 'B-R16-1', p1: g(1, 0), p2: t(1) },
       { id: 'B-R16-2', p1: g(2, 0), p2: g(5, 1) },

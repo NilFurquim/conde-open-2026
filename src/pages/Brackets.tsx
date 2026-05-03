@@ -2,18 +2,18 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchAllMatches } from '../lib/matchService';
 import { computeGroupStandings } from '../lib/standingsService';
-import { Match, MatchStatus, GroupStanding, Category } from '../types';
+import { Match, GroupStanding, Category } from '../types';
 import Layout from '../components/Layout';
 import { CheckCircle2 } from 'lucide-react';
 import {
   CATEGORY_A_GROUPS, CATEGORY_B_GROUPS, CATEGORY_C_GROUPS,
   CATEGORY_COLORS, GROUP_COLOR_CLASSES, ROUND_ORDER
 } from '../constants/tournamentData';
+import BracketFlow from '../components/BracketFlow';
+import { LAYOUT_SINGLES, LAYOUT_DUPLAS } from '../lib/bracketLayouts';
 
 type CatTab = Category;
 type SubTab = 'grupos' | 'chave';
-
-const isTBD = (name: string) => name.includes('º') || name.startsWith('Venc.') || name.startsWith('Melhor');
 
 // ── Group standings table ──────────────────────────────────────────────────
 const StandingsTable: React.FC<{ standings: GroupStanding[]; groupNum: number }> = ({ standings, groupNum }) => {
@@ -59,53 +59,6 @@ const StandingsTable: React.FC<{ standings: GroupStanding[]; groupNum: number }>
   );
 };
 
-// ── Knockout match card ─────────────────────────────────────────────────────
-const KOMatch: React.FC<{ match: Match; onClick: () => void }> = ({ match, onClick }) => {
-  const isCompleted = match.status === MatchStatus.COMPLETED;
-  const tbd1 = isTBD(match.p1);
-  const tbd2 = isTBD(match.p2);
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full text-left bg-white border border-border-muted rounded-xl p-3 active:bg-slate-50 transition-colors"
-    >
-      <div className="text-[9px] text-secondary font-bold uppercase mb-2">J{match.matchNum}</div>
-      <div className="space-y-1">
-        {[
-          { name: match.p1, score: match.score1, winner: match.winner, tbd: tbd1 },
-          { name: match.p2, score: match.score2, winner: match.winner, tbd: tbd2 },
-        ].map((p, i) => (
-          <div key={i} className="flex items-center justify-between gap-2">
-            <span className={`text-sm flex-1 min-w-0 truncate ${p.tbd ? 'text-secondary italic text-xs' : p.winner === p.name ? 'font-bold text-navy-900' : 'text-on-surface/70'}`}>
-              {p.name}
-            </span>
-            {isCompleted && p.score && (
-              <div className="flex gap-0.5 shrink-0">
-                {p.score.map((s, j) => (
-                  <span key={j} className={`w-5 h-5 flex items-center justify-center rounded text-[10px] font-bold ${p.winner === p.name ? 'bg-navy-900 text-white' : 'bg-slate-100 text-slate-500'}`}>{s}</span>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </button>
-  );
-};
-
-// ── Knockout bracket section ────────────────────────────────────────────────
-const KOSection: React.FC<{ round: string; matches: Match[]; onMatch: (m: Match) => void }> = ({ round, matches, onMatch }) => (
-  <div className="space-y-2">
-    <h3 className="font-lexend font-bold text-xs text-secondary uppercase tracking-wider">{round}</h3>
-    <div className="grid grid-cols-2 gap-2">
-      {matches.map(m => (
-        <KOMatch key={m.id} match={m} onClick={() => onMatch(m)} />
-      ))}
-    </div>
-  </div>
-);
-
 // ── Main Brackets page ──────────────────────────────────────────────────────
 const Brackets: React.FC = () => {
   const navigate = useNavigate();
@@ -120,7 +73,6 @@ const Brackets: React.FC = () => {
 
   const catMatches = useMemo(() => allMatches.filter(m => m.category === catTab), [allMatches, catTab]);
 
-  const groupMatches = useMemo(() => catMatches.filter(m => m.round === 'Grupos' || m.round === 'Play-in'), [catMatches]);
   const knockoutMatches = useMemo(() =>
     catMatches.filter(m => m.round !== 'Grupos').sort((a, b) => {
       const ao = ROUND_ORDER[a.round] ?? 0;
@@ -143,18 +95,13 @@ const Brackets: React.FC = () => {
     return result;
   }, [allMatches, catTab, groupDefs]);
 
-  const knockoutByRound = useMemo(() => {
-    const rounds: Record<string, Match[]> = {};
-    knockoutMatches.forEach(m => {
-      if (!rounds[m.round]) rounds[m.round] = [];
-      rounds[m.round].push(m);
-    });
-    return rounds;
-  }, [knockoutMatches]);
-
-  const catColors = CATEGORY_COLORS[catTab] || CATEGORY_COLORS.A;
-
   const hasDuplas = catTab === 'Duplas';
+
+  const bracketColumns = !hasDuplas && (catTab === 'A' || catTab === 'B' || catTab === 'C')
+    ? LAYOUT_SINGLES[catTab]
+    : hasDuplas
+      ? LAYOUT_DUPLAS
+      : null;
 
   return (
     <Layout title="Chaves">
@@ -207,26 +154,16 @@ const Brackets: React.FC = () => {
             )}
 
             {/* Knockout tab or Duplas */}
-            {(subTab === 'chave' || hasDuplas) && (
-              <div className="space-y-6">
-                {hasDuplas && (
-                  <div className="space-y-2">
-                    <h3 className="font-lexend font-bold text-xs text-secondary uppercase tracking-wider">Play-in</h3>
-                    <div className="grid grid-cols-2 gap-2">
-                      {knockoutMatches.filter(m => m.round === 'Play-in').map(m => (
-                        <KOMatch key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
-                      ))}
-                    </div>
-                  </div>
+            {(subTab === 'chave' || hasDuplas) && bracketColumns && (
+              <div className="space-y-2">
+                {bracketColumns.length > 2 && (
+                  <p className="text-[10px] text-secondary text-center">Deslize horizontalmente para ver todas as fases</p>
                 )}
-
-                {Object.entries(knockoutByRound)
-                  .filter(([round]) => !hasDuplas || round !== 'Play-in')
-                  .sort(([a], [b]) => (ROUND_ORDER[a] ?? 0) - (ROUND_ORDER[b] ?? 0))
-                  .map(([round, matches]) => (
-                    <KOSection key={round} round={round} matches={matches} onMatch={m => navigate(`/match/${m.id}`)} />
-                  ))
-                }
+                <BracketFlow
+                  columns={bracketColumns}
+                  matches={knockoutMatches}
+                  onMatch={m => navigate(`/match/${m.id}`)}
+                />
               </div>
             )}
           </>
