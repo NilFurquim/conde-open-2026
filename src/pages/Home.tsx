@@ -34,6 +34,11 @@ function getDayChip(date: Date): string {
   return format(date, "dd/MM", { locale: ptBR }).toUpperCase();
 }
 
+function formatCompactStatusDate(date: Date): string {
+  const weekday = format(date, 'EEE', { locale: ptBR }).replace('.', '').slice(0, 3).toLowerCase();
+  return `${weekday} ${format(date, "dd/MM 'às' HH:mm", { locale: ptBR })}`;
+}
+
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
 const PlayerAvatar: React.FC<{ name: string; photoURL?: string; highlight?: boolean }> = ({
@@ -194,17 +199,14 @@ export const ScheduledMatchCard: React.FC<{ match: Match; onClick: () => void }>
   const date = match.scheduledAt?.toDate();
   const isTodayUpcoming = !!date && isToday(date) && !isPast(date);
   const statusDateLabel = date
-    ? format(date, "EEE dd/MM 'às' HH:mm", { locale: ptBR })
+    ? formatCompactStatusDate(date)
     : 'Sem horário';
   return (
     <button onClick={onClick} className="w-full text-left bg-white border border-slate-100 rounded-xl px-4 py-3 shadow-sm">
       <CardHeader
         match={match}
         status={
-          <span className="text-secondary font-lexend text-[10px] font-bold uppercase tracking-wide flex items-center gap-1 truncate">
-            <svg className="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-            </svg>
+          <span className="text-secondary font-lexend text-[10px] font-bold tracking-wide flex items-center gap-1 truncate">
             {isTodayUpcoming && (
               <span className="bg-primary-container text-navy-900 px-1.5 py-0.5 rounded font-black text-[9px] shrink-0">
                 HOJE
@@ -228,12 +230,10 @@ export const CompletedMatchCard: React.FC<{ match: Match; onClick: () => void }>
     <CardHeader
       match={match}
       status={
-        <span className="text-slate-400 font-lexend text-[10px] font-bold uppercase tracking-wide truncate">
-          {`Finalizado - ${
-            match.scheduledAt
-              ? format(match.scheduledAt.toDate(), "dd/MM 'às' HH:mm", { locale: ptBR })
-              : '--/-- --:--'
-          }`}
+        <span className="text-slate-400 font-lexend text-[10px] font-bold tracking-wide truncate">
+          {match.scheduledAt
+            ? formatCompactStatusDate(match.scheduledAt.toDate())
+            : '--/-- --:--'}
         </span>
       }
     />

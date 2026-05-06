@@ -1,12 +1,26 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  addMonths,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isBefore,
+  isSameMonth,
+  isToday,
+  parseISO,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+} from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { fetchAllMatches } from '../lib/matchService';
 import { Match, MatchStatus } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import SearchableParticipantCombobox from '../components/SearchableParticipantCombobox';
-import { ROUND_ORDER, type CategoryFilterKey } from '../constants/tournamentData';
-import CategoryFilterStrip from '../components/CategoryFilterStrip';
+import { CATEGORY_COLORS, ROUND_ORDER, type CategoryFilterKey } from '../constants/tournamentData';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   PendingScheduleCard,
   ScheduledMatchCard,
@@ -21,18 +35,9 @@ type StatusFilter = typeof STATUSES[number];
 
 const isTBD = (name: string) => name.includes('º') || name.startsWith('Venc.') || name.startsWith('Melhor');
 
-const FilterPill: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
-  <button
-    onClick={onClick}
-    className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors ${active ? 'bg-navy-900 text-white' : 'bg-white border border-border-muted text-secondary'}`}
-  >
-    {children}
-  </button>
-);
-
 const Agenda: React.FC = () => {
   const navigate = useNavigate();
-  const { profile, isGuest } = useAuth();
+  const { profile } = useAuth();
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
   const [catFilter, setCatFilter] = useState<CategoryFilterKey>('TODOS');
@@ -40,7 +45,9 @@ const Agenda: React.FC = () => {
   const [participantKey, setParticipantKey] = useState('');
   const [participantQuery, setParticipantQuery] = useState('');
   const [participantDropdownOpen, setParticipantDropdownOpen] = useState(false);
-  const [myOnly, setMyOnly] = useState(false);
+  const [myOnly] = useState(false);
+  const [monthCursor, setMonthCursor] = useState<Date>(() => startOfMonth(new Date()));
+  const [selectedDayKey, setSelectedDayKey] = useState<string>(() => format(new Date(), 'yyyy-MM-dd'));
 
   const playerName = profile?.playerName;
 
@@ -110,45 +117,96 @@ const Agenda: React.FC = () => {
   }, [allMatches, catFilter, statusFilter, participantKey, participantQuery, myOnly, playerName]);
 
   const pendingCount = allMatches.filter(m => m.status === MatchStatus.PENDING && !isTBD(m.p1)).length;
+  const renderMatchCard = (m: Match) => (
+    m.status === MatchStatus.PENDING ? (
+      <PendingScheduleCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+    ) : (m.status === MatchStatus.COMPLETED || isVisuallyFinished(m)) ? (
+      <CompletedMatchCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+    ) : (
+      <ScheduledMatchCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+    )
+  );
+  const scheduledWithDate = useMemo(
+    () => filtered.filter(m => !!m.scheduledAt),
+    [filtered],
+  );
+  const matchesByDay = useMemo(() => {
+    const map = new Map<string, Match[]>();
+    for (const m of scheduledWithDate) {
+      const key = format(m.scheduledAt!.toDate(), 'yyyy-MM-dd');
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(m);
+    }
+    return map;
+  }, [scheduledWithDate]);
+  const categoriesByDay = useMemo(() => {
+    const map = new Map<string, Set<Match['category']>>();
+    for (const m of scheduledWithDate) {
+      const key = format(m.scheduledAt!.toDate(), 'yyyy-MM-dd');
+      if (!map.has(key)) map.set(key, new Set());
+      map.get(key)!.add(m.category);
+    }
+    return map;
+  }, [scheduledWithDate]);
+  const selectedDayMatches = matchesByDay.get(selectedDayKey) ?? [];
+  const monthLabel = format(monthCursor, "MMMM 'de' yyyy", { locale: ptBR });
+  const calendarDays = useMemo(() => {
+    const start = startOfWeek(startOfMonth(monthCursor), { weekStartsOn: 0 });
+    const end = endOfWeek(endOfMonth(monthCursor), { weekStartsOn: 0 });
+    const days: Date[] = [];
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      days.push(new Date(d));
+    }
+    return days;
+  }, [monthCursor]);
 
   return (
     <Layout title="Agenda">
       <div className="space-y-4">
-        <div className="-mx-1 px-1">
-          <CategoryFilterStrip value={catFilter} onChange={setCatFilter} />
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-          {STATUSES.map(s => (
-            <FilterPill key={s} active={statusFilter === s} onClick={() => setStatusFilter(s)}>
-              {s}{s === 'Pendentes' && pendingCount > 0 ? ` (${pendingCount})` : ''}
-            </FilterPill>
-          ))}
-        </div>
-        <div className="flex gap-2 items-center">
-          <div className="min-w-0 flex-1">
-            <SearchableParticipantCombobox
-              id="agenda-participant-combo"
-              listBoxId="agenda-participant-combo-list"
-              allOptionLabel="Todos"
-              options={participantOptions}
-              selectedKey={participantKey}
-              comboQuery={participantQuery}
-              dropdownOpen={participantDropdownOpen}
-              placeholder="Todos ou digite para filtrar…"
-              onDropdownOpenChange={setParticipantDropdownOpen}
-              onSelectedKeyChange={setParticipantKey}
-              onComboQueryChange={setParticipantQuery}
-            />
-          </div>
-          {!isGuest && playerName && (
-            <button
-              type="button"
-              onClick={() => setMyOnly(v => !v)}
-              className={`shrink-0 px-3 py-2.5 rounded-xl text-xs font-bold border transition-colors ${myOnly ? 'bg-navy-900 text-white border-navy-900' : 'bg-white border-border-muted text-secondary'}`}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1">
+            <p className="font-lexend text-[10px] font-bold uppercase tracking-widest text-secondary">Categoria</p>
+            <select
+              value={catFilter}
+              onChange={e => setCatFilter(e.target.value as CategoryFilterKey)}
+              className="w-full rounded-xl border border-border-muted bg-white px-3 py-2.5 text-sm font-semibold text-navy-900 outline-none"
             >
-              Meus
-            </button>
-          )}
+              <option value="TODOS">Todas</option>
+              <option value="A">Cat A</option>
+              <option value="B">Cat B</option>
+              <option value="C">Cat C</option>
+              <option value="Duplas">Duplas</option>
+            </select>
+          </div>
+          <div className="space-y-1">
+            <p className="font-lexend text-[10px] font-bold uppercase tracking-widest text-secondary">Tipo do evento</p>
+            <select
+              value={statusFilter}
+              onChange={e => setStatusFilter(e.target.value as StatusFilter)}
+              className="w-full rounded-xl border border-border-muted bg-white px-3 py-2.5 text-sm font-semibold text-navy-900 outline-none"
+            >
+              {STATUSES.map(s => (
+                <option key={s} value={s}>
+                  {s}{s === 'Pendentes' && pendingCount > 0 ? ` (${pendingCount})` : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div>
+          <SearchableParticipantCombobox
+            id="agenda-participant-combo"
+            listBoxId="agenda-participant-combo-list"
+            allOptionLabel="Todos"
+            options={participantOptions}
+            selectedKey={participantKey}
+            comboQuery={participantQuery}
+            dropdownOpen={participantDropdownOpen}
+            placeholder="Todos ou digite para filtrar…"
+            onDropdownOpenChange={setParticipantDropdownOpen}
+            onSelectedKeyChange={setParticipantKey}
+            onComboQueryChange={setParticipantQuery}
+          />
         </div>
 
         {loading ? (
@@ -157,18 +215,97 @@ const Agenda: React.FC = () => {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-16 text-secondary text-sm">Nenhuma partida encontrada.</div>
-        ) : (
+        ) : statusFilter === 'Pendentes' ? (
           <div className="space-y-2">
             <p className="text-xs text-secondary">{filtered.length} partida{filtered.length !== 1 ? 's' : ''}</p>
-            {filtered.map(m => (
-              m.status === MatchStatus.PENDING ? (
-                <PendingScheduleCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
-              ) : (m.status === MatchStatus.COMPLETED || isVisuallyFinished(m)) ? (
-                <CompletedMatchCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+            {filtered.map(renderMatchCard)}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div className="bg-white border border-border-muted rounded-2xl p-3 shadow-sm space-y-3">
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => setMonthCursor(prev => addMonths(prev, -1))}
+                  className="w-8 h-8 rounded-lg border border-border-muted flex items-center justify-center text-secondary"
+                  aria-label="Mês anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <p className="font-lexend font-bold text-sm text-navy-900 capitalize">{monthLabel}</p>
+                <button
+                  type="button"
+                  onClick={() => setMonthCursor(prev => addMonths(prev, 1))}
+                  className="w-8 h-8 rounded-lg border border-border-muted flex items-center justify-center text-secondary"
+                  aria-label="Próximo mês"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-7 text-[10px] text-secondary font-bold uppercase tracking-wide px-1">
+                {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => (
+                  <div key={d} className="text-center py-1">{d}</div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1">
+                {calendarDays.map(day => {
+                  const key = format(day, 'yyyy-MM-dd');
+                  const hasMatches = matchesByDay.has(key);
+                  const dayCats = Array.from(categoriesByDay.get(key) ?? []);
+                  const isSelected = key === selectedDayKey;
+                  const inMonth = isSameMonth(day, monthCursor);
+                  const today = isToday(day);
+                  const past = isBefore(startOfDay(day), startOfDay(new Date()));
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setSelectedDayKey(key)}
+                      className={`relative h-11 rounded-lg border text-xs transition-colors ${
+                        isSelected
+                          ? 'bg-navy-900 text-white border-navy-900'
+                          : today
+                            ? 'bg-primary/5 border-primary/40 text-navy-900'
+                            : past
+                              ? 'bg-slate-50 border-slate-200 text-slate-500'
+                              : inMonth
+                                ? 'bg-white border-border-muted text-navy-900'
+                                : 'bg-slate-50 border-slate-100 text-slate-400'
+                      }`}
+                    >
+                      <span className={`font-semibold ${today && !isSelected ? 'underline underline-offset-2' : ''}`}>
+                        {format(day, 'd')}
+                      </span>
+                      {hasMatches && (
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5">
+                          {dayCats.map(cat => (
+                            <span
+                              key={cat}
+                              className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-primary-container' : (CATEGORY_COLORS[cat]?.swatch ?? 'bg-primary')}`}
+                            />
+                          ))}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs text-secondary">
+                {format(parseISO(selectedDayKey), "dd/MM/yyyy", { locale: ptBR })} · {selectedDayMatches.length} partida{selectedDayMatches.length !== 1 ? 's' : ''}
+              </p>
+              {selectedDayMatches.length === 0 ? (
+                <div className="text-center py-8 text-secondary text-sm bg-white border border-border-muted rounded-xl">
+                  Nenhuma partida nesse dia.
+                </div>
               ) : (
-                <ScheduledMatchCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
-              )
-            ))}
+                selectedDayMatches.map(renderMatchCard)
+              )}
+            </div>
           </div>
         )}
       </div>

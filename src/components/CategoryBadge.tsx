@@ -18,7 +18,7 @@ function getCatLabel(cat: string): string {
 
 function getPhaseLabel(match: Pick<Match, 'round' | 'group' | 'matchNum'>): string {
   const parts: string[] = [match.round];
-  if (match.group) parts.push(`Grupo ${match.group}`);
+  if (match.group) parts.push(`G${match.group}`);
   if (match.matchNum != null && match.round !== 'Grupos') parts.push(`J${match.matchNum}`);
   return parts.join(' · ');
 }

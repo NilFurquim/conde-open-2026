@@ -211,10 +211,10 @@ const Stats: React.FC = () => {
         </p>
 
         <div className="overflow-x-auto rounded-2xl border border-border-muted bg-white shadow-sm">
-          <table className="w-full min-w-[320px] text-left text-xs">
+          <table className="w-full min-w-[300px] text-left text-xs">
             <thead>
               <tr className="border-b border-border-muted bg-slate-50">
-                <th className="px-3 py-2.5 font-lexend font-bold text-secondary">#</th>
+                <th className="px-2 py-2.5 font-lexend font-bold text-secondary">#</th>
                 <SortTh
                   label={category === 'Duplas' ? 'Dupla' : 'Jogador'}
                   sortKey="name"
@@ -233,7 +233,7 @@ const Stats: React.FC = () => {
             <tbody>
               {displayRows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-secondary">
+                  <td colSpan={7} className="px-3 py-10 text-center text-sm text-secondary">
                     {rawRows.length === 0
                       ? 'Nenhuma partida com resultado nesta categoria ainda.'
                       : 'Nenhum resultado para esta busca.'}
@@ -248,20 +248,20 @@ const Stats: React.FC = () => {
                 const gameBalStr = `${gameBal >= 0 ? '+' : ''}${gameBal}`;
                 return (
                   <tr key={row.entityLabel} className="border-b border-border-muted last:border-0">
-                    <td className="px-3 py-2.5 font-bold text-navy-900">{displayRank}</td>
-                    <td className="max-w-[140px] truncate px-3 py-2.5 font-semibold text-navy-900 sm:max-w-none">
+                    <td className="px-2 py-2.5 font-bold text-navy-900">{displayRank}</td>
+                    <td className="max-w-[130px] truncate px-2 py-2.5 font-semibold text-navy-900 sm:max-w-none">
                       {row.entityLabel}
                     </td>
-                    <td className="px-2 py-2.5 text-center font-bold text-navy-900">{row.matchesPlayed}</td>
-                    <td className="px-2 py-2.5 text-center font-semibold text-green-700">{row.wins}</td>
-                    <td className="px-2 py-2.5 text-center font-semibold text-red-600">{row.losses}</td>
-                    <td className="px-2 py-2.5 text-center text-secondary whitespace-nowrap">
+                    <td className="px-1.5 py-2.5 text-center font-bold text-navy-900">{row.matchesPlayed}</td>
+                    <td className="px-1.5 py-2.5 text-center font-semibold text-green-700">{row.wins}</td>
+                    <td className="px-1.5 py-2.5 text-center font-semibold text-red-600">{row.losses}</td>
+                    <td className="px-1.5 py-2.5 text-center text-secondary whitespace-nowrap">
                       {row.setsWon}-{row.setsLost}
                       <span className={`ml-0.5 text-[10px] ${setBal > 0 ? 'text-green-700' : setBal < 0 ? 'text-red-600' : 'text-secondary'}`}>
                         ({setBalStr})
                       </span>
                     </td>
-                    <td className="px-2 py-2.5 text-center text-secondary whitespace-nowrap">
+                    <td className="px-1.5 py-2.5 text-center text-secondary whitespace-nowrap">
                       {row.gamesWon}-{row.gamesLost}
                       <span className={`ml-0.5 text-[10px] ${gameBal > 0 ? 'text-green-700' : gameBal < 0 ? 'text-red-600' : 'text-secondary'}`}>
                         ({gameBalStr})
