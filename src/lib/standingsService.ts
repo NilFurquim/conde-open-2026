@@ -70,19 +70,20 @@ const headToHead = (a: GroupStanding, b: GroupStanding, matches: Match[]): numbe
 
 export const sortStandings = (standings: GroupStanding[], matches: Match[] = []): GroupStanding[] => {
   return [...standings].sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    // Head-to-head when tied on points
-    if (a.points === b.points && a.matchesPlayed > 0) {
+    // 1. Número de vitórias
+    if (b.wins !== a.wins) return b.wins - a.wins;
+    // 2. Confronto direto (quando empate em vitórias)
+    if (a.matchesPlayed > 0 && b.matchesPlayed > 0) {
       const h = headToHead(a, b, matches);
       if (h !== 0) return h;
     }
-    // Sets ratio
+    // 3. Saldo de sets (ratio)
     const aSetTotal = a.setsWon + a.setsLost;
     const bSetTotal = b.setsWon + b.setsLost;
     const aSetRatio = aSetTotal > 0 ? a.setsWon / aSetTotal : 0;
     const bSetRatio = bSetTotal > 0 ? b.setsWon / bSetTotal : 0;
     if (Math.abs(bSetRatio - aSetRatio) > 0.001) return bSetRatio - aSetRatio;
-    // Games ratio
+    // 4. Saldo de games (ratio)
     const aGTotal = a.gamesWon + a.gamesLost;
     const bGTotal = b.gamesWon + b.gamesLost;
     const aGRatio = aGTotal > 0 ? a.gamesWon / aGTotal : 0;

@@ -1,3 +1,5 @@
+import type { Category } from '../types';
+
 export const CATEGORY_A_GROUPS: Record<number, string[]> = {
   1: ['Pedro', 'Fernando', 'Amauri', 'Saito'],
   2: ['Alex', 'Osvaldo', 'Paulo', 'Gustavo'],
@@ -62,11 +64,28 @@ export const getPlayerCategories = (playerName: string): string[] => {
   return cats;
 };
 
-export const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string; light: string }> = {
-  A:      { bg: 'bg-blue-600',   text: 'text-blue-600',   border: 'border-blue-600',   light: 'bg-blue-50'   },
-  B:      { bg: 'bg-green-600',  text: 'text-green-600',  border: 'border-green-600',  light: 'bg-green-50'  },
-  C:      { bg: 'bg-purple-600', text: 'text-purple-600', border: 'border-purple-600', light: 'bg-purple-50' },
-  Duplas: { bg: 'bg-orange-500', text: 'text-orange-500', border: 'border-orange-500', light: 'bg-orange-50' },
+/** Chip "Todos as categorias" nas telas de filtro */
+export type CategoryFilterKey = 'TODOS' | Category;
+
+export const CATEGORY_TAB_ORDER: Category[] = ['A', 'B', 'C', 'Duplas'];
+
+export const CATEGORY_FILTER_DEFS: { key: CategoryFilterKey; label: string }[] = [
+  { key: 'TODOS', label: 'Todos' },
+  ...CATEGORY_TAB_ORDER.map((key): { key: CategoryFilterKey; label: string } => ({
+    key,
+    label: key === 'Duplas' ? 'Duplas' : `Cat ${key}`,
+  })),
+];
+
+/**
+ * Pastéis nos pills (A/B), bronze avermelhado (C), Duplas em laranja pastel um pouco vivo.
+ * `bg` + `text` = contraste do chip; `border` = contorno em cards; `light` = blocos suaves.
+ */
+export const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string; light: string; swatch: string }> = {
+  A:      { bg: 'bg-yellow-100',   text: 'text-amber-950',  border: 'border-amber-300/80',  light: 'bg-yellow-50/90',  swatch: 'bg-amber-600' },
+  B:      { bg: 'bg-slate-100',    text: 'text-slate-800',  border: 'border-slate-300/80', light: 'bg-slate-50',      swatch: 'bg-slate-500' },
+  C:      { bg: 'bg-orange-200',  text: 'text-red-950',    border: 'border-orange-700/40', light: 'bg-orange-50',   swatch: 'bg-orange-900' },
+  Duplas: { bg: 'bg-orange-400',  text: 'text-orange-950', border: 'border-orange-500',    light: 'bg-orange-50',   swatch: 'bg-orange-600' },
 };
 
 export const GROUP_COLOR_CLASSES: Record<number, { bg: string; text: string; light: string }> = {

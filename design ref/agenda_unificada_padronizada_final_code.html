@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;family=Work+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#476083",
+                    "on-tertiary-container": "#646768",
+                    "surface-variant": "#e5e2e1",
+                    "surface": "#fcf9f8",
+                    "secondary-fixed-dim": "#afc8f0",
+                    "on-tertiary-fixed": "#191c1d",
+                    "on-secondary-container": "#445d80",
+                    "surface-container-high": "#ebe7e7",
+                    "outline-variant": "#c0caad",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#467200",
+                    "inverse-primary": "#8bdc00",
+                    "secondary-container": "#bdd6ff",
+                    "inverse-surface": "#313030",
+                    "on-secondary-fixed-variant": "#2f486a",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#d4e3ff",
+                    "background": "#fcf9f8",
+                    "surface-tint": "#406900",
+                    "on-background": "#1c1b1b",
+                    "tertiary": "#5c5f60",
+                    "tertiary-container": "#e5e6e7",
+                    "on-surface": "#1c1b1b",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#a2ff00",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3f2",
+                    "primary": "#406900",
+                    "surface-bright": "#fcf9f8",
+                    "primary-fixed-dim": "#8bdc00",
+                    "on-secondary-fixed": "#001c3a",
+                    "surface-container": "#f0edec",
+                    "on-surface-variant": "#414a34",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "outline": "#717b61",
+                    "surface-container-highest": "#e5e2e1",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-primary-fixed": "#102000",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#9ffb00",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#dcd9d9",
+                    "on-primary-fixed-variant": "#2f4f00",
+                    "tertiary-fixed": "#e1e3e4",
+                    "navy-900": "#001c3a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "8px",
+                    "base": "4px",
+                    "lg": "32px",
+                    "gutter": "12px",
+                    "xl": "48px",
+                    "container-margin": "16px",
+                    "md": "24px",
+                    "sm": "16px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Lexend"],
+                    "display-lg": ["Lexend"],
+                    "headline-md": ["Lexend"],
+                    "data-tabular": ["Work Sans"],
+                    "body-md": ["Work Sans"],
+                    "title-sm": ["Lexend"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1.0", "fontWeight": "700"}],
+                    "display-lg": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "data-tabular": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { min-height: max(884px, 100dvh); }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface min-h-screen pb-24">
+<!-- TopAppBar Component -->
+<header class="bg-white dark:bg-slate-900 fixed top-0 w-full z-50 border-b border-slate-100 dark:border-slate-800 shadow-sm">
+<div class="flex justify-between items-center px-4 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-900 dark:text-lime-400 font-black text-xl">sports_tennis</span>
+<h1 class="font-lexend font-bold text-lg tracking-tight text-slate-900 dark:text-white">Agenda</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container active:scale-95 transition-transform duration-150 cursor-pointer">
+<img alt="Foto do Perfil" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP2hPz7OJG8EvLmit9hffWixmDcAbA8avszWZELut1DyPW7EqJdbMYW-0RzrMEimcATYMpvWg63aeCg-DatSi4MTxA4yeEt-wEpRL4J9FIKMQ9vpzXMpPAVRcTEgJ-1BPMH5ldzUbX9vn0sUtoWGZ2LRVKuj8fYYBiTWrzkbtIzY58VGi2kb32LzMPvSSlFIaTYU50ghOMcO6HkG4Zm0Mm-m3LYIaUSnpvTX6Y6fplXI9W17pVbldDwHyhlIrbFyMIdWIV10c7ejlG"/>
+</div>
+</div>
+<!-- Category Filters -->
+<div class="px-4 pb-4 overflow-x-auto flex gap-2 hide-scrollbar bg-white dark:bg-slate-900">
+<button class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-caps text-label-caps whitespace-nowrap active:scale-95 transition-all">Todas</button>
+<button class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-caps text-label-caps whitespace-nowrap active:scale-95 transition-all">Cat A</button>
+<button class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-caps text-label-caps whitespace-nowrap active:scale-95 transition-all">Cat B</button>
+<button class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-caps text-label-caps whitespace-nowrap active:scale-95 transition-all">Cat C</button>
+<button class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-caps text-label-caps whitespace-nowrap active:scale-95 transition-all">Feminino</button>
+<button class="bg-surface-container-low border border-outline-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-caps text-label-caps whitespace-nowrap active:scale-95 transition-all">Duplas</button>
+</div>
+<!-- Week Selector -->
+<div class="flex border-t border-slate-100 bg-white">
+<button class="flex-1 py-3 text-center border-b-2 border-primary-container text-navy-900 font-bold font-lexend text-sm">Semana 1</button>
+<button class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 font-lexend text-sm">Semana 2</button>
+<button class="flex-1 py-3 text-center border-b-2 border-transparent text-slate-400 font-lexend text-sm">Semana 3</button>
+</div>
+</header>
+<main class="pt-48 px-container-margin py-md space-y-lg relative">
+<!-- Date Section 1 -->
+<section class="relative">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-lg bg-navy-900 flex items-center justify-center text-white">
+<span class="font-lexend font-bold text-sm">14</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-navy-900">Hoje, Terça</h2>
+</div>
+<div class="space-y-4">
+<!-- LIVE CARD -->
+<div class="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden border-l-4 border-l-primary-container">
+<div class="p-4 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<div class="flex gap-2">
+<span class="bg-surface-container-low text-navy-900 px-2 py-0.5 rounded font-label-caps text-label-caps">CATEGORIA A</span>
+<span class="text-slate-400 font-label-caps text-label-caps">OITAVAS</span>
+</div>
+<div class="flex items-center gap-1.5 bg-red-50 px-2 py-0.5 rounded">
+<div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+<span class="text-red-500 font-label-caps text-[10px]">AO VIVO</span>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="Player" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdyxy0Te_eEPIE1qcfeyB79uLyws5fKbvBG9xO7PWvTq7iu_ohOvePVkaLNRkp_PByLwHrFQeGdOu3fqopoov6XDpE84RqGOCPjeLO0NSD5hQvVC-TBj4U1B_ndaFVJGrgc1HAZmlUKB-CIU2u9Fv8GMPmHIzzcN8bVHO9fDj7nTsfHtmqCM5kt9gXKQS20EU3swYBwbmm8h1E_3N19fReneGRAHl78rwc0qnfBpmiTgPeWQ6ELN-5ncY9z-BpkAym0anoweki_XDS"/>
+<span class="font-lexend font-semibold text-on-surface">Bruno Alves</span>
+</div>
+<div class="flex gap-2 font-lexend font-bold text-navy-900">
+<span class="bg-slate-50 w-6 text-center rounded">6</span>
+<span class="bg-primary-container w-6 text-center rounded">3</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="Player" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_UHyK6j1xhi88kzcpItHI7URy2rYbOtmsNq-6kdPNVLJMY1QUn8ZQu5acrgeAHcqp9EpvX8FR1MRrxW2cq6L5N7Zr7zagW4kGWKTqbFcRjhOzMD_McF7dEvByjzyPH59U70jDd3sWZYSACdNtA6VNNoUT9P-lDz4MJMLEdb78ikGs4Lk7Y7EYZTnUZ4RPgMpPzBKKfgAKl1Dm1DvVJRMpxLweqh78Dmse_HAQDYjJm-tDl3WLPvOxaQgs2QbYLniMkrWkZ6oMPdv_"/>
+<span class="font-lexend font-semibold text-on-surface">Carlos Mendonça</span>
+</div>
+<div class="flex gap-2 font-lexend font-bold text-navy-900">
+<span class="bg-slate-50 w-6 text-center rounded">4</span>
+<span class="bg-slate-50 w-6 text-center rounded">2</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- SCHEDULED CARD -->
+<div class="bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+<div class="p-4 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<div class="flex gap-2">
+<span class="bg-surface-container-low text-navy-900 px-2 py-0.5 rounded font-label-caps text-label-caps">CATEGORIA B</span>
+<span class="text-slate-400 font-label-caps text-label-caps">GRUPOS</span>
+</div>
+<span class="bg-navy-900 text-white px-2 py-0.5 rounded font-label-caps text-[10px]">AGENDADO</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3">
+<img alt="Player" class="w-8 h-8 rounded-full opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu7XwPqey_0ZDRl0gjVQBIncNrQaGRG_MpYzySwpZF9Te3-85yS_NneCS9os4U0sjmuTrm8YQNSNhHg26JsVy5rzY_I73UWAYA7ZSkDXPFmfE52U0f6ZWbCVdMNfsd0AHQcrGaNlCif5iTCzbvL8O2ha7Mw2emGQqaj47zCPJIVcLzjvZ7t8M_WKIQF4xxBpIChJJq5MHuO5MHDsw272s8yUXg_5FaEoPA-S41kWliSsbE9JIZQSaO1ToIYwzrk7Dt9IyCgSL_u-SY"/>
+<span class="font-lexend font-semibold text-slate-500">Rafael Silva</span>
+</div>
+<div class="flex items-center gap-3">
+<img alt="Player" class="w-8 h-8 rounded-full opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3BosAh1AcKArDKS4-Fmvq1xQq1zXf-cIpfoqI8EdDan3XXfcjMT39KuR35RrKVqopaGIMO4gP89d1kne6y4qlDTpq7uEwgCTGqw8Tr5gZHiP0YHDa08IyI6rqMo_mTvx6lkV-8qVZA5Bn0zCEUxVKBASJ_KbbwxWRGf2bykhfq1fqzEeVdeERelpQC_8YgJcIfuqXEKdhie9HfHlCWfPnTv-esECGGOvOqdRLJ9aIgKX_y5jvmbn58W8gnoFD95kR-N_t2jf3chak"/>
+<span class="font-lexend font-semibold text-slate-500">Juliana Costa</span>
+</div>
+</div>
+<div class="pt-3 border-t border-slate-50 flex items-center gap-2 text-slate-400">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+<span class="font-data-tabular text-data-tabular">16:30 • Quadra 02</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Date Section 2 -->
+<section class="relative">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+<span class="font-lexend font-bold text-sm">15</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-slate-400">Amanhã, Quarta</h2>
+</div>
+<div class="space-y-4">
+<!-- FINALIZED CARD -->
+<div class="bg-white opacity-80 rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+<div class="p-4 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<div class="flex gap-2">
+<span class="bg-surface-container-low text-navy-900 px-2 py-0.5 rounded font-label-caps text-label-caps">FEMININO</span>
+<span class="text-slate-400 font-label-caps text-label-caps">FINAL</span>
+</div>
+<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-label-caps text-[10px]">FINALIZADO</span>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Player" class="w-8 h-8 rounded-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCznzDWb7xcrKyEIHsJvvRh1Fg9MdllD7NfiZl-wjOUdMWEq-0RJMGT_kTZsaXkZQbnrmzsD_E1SScQYpltUA7Mv-CbnLUCjsvuMyNwnWI8B6bVKSuGl0z7zMvh_gBSc6a-VA4rHUbkW8axyVyFvsnmYQ10Ed73BVM8SzbKK2ZpneEaagrJOfVDrUarQttntrIYDjx9dNBfhbQLnKrNa5_hqL_y8pQpWCYaPSiydF1hdSHTMMOsyoFCo2fCbw-wdPWcTPSzXcI1vPYm"/>
+<span class="absolute -bottom-1 -right-1 bg-primary-container text-navy-900 rounded-full text-[10px] p-0.5 material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="font-lexend font-bold text-on-surface">Beatriz Haddad</span>
+</div>
+<div class="flex gap-2 font-lexend font-bold text-navy-900">
+<span class="w-6 text-center">6</span>
+<span class="w-6 text-center font-black">7</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<img alt="Player" class="w-8 h-8 rounded-full opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHeghVuoV5joSQeXsr4G6GdU9j7j9U4yl3xjhBilWBOH2hpczZ-nk_xbi3dMv-0o2U2G181WG5GUBhVr2gCjZ4N1MMZfxGSvoHygx6-fRFwIrCy6WjyBWEKDUB29sZBGS61ilpPHHWyotQFLrKZ604pXo0QgYKvTl0TuvAKR4yXrTf-BRy_2OPkw-8s1eck1jAIiuBHcuRz687tEb2g3uX7USLg3wDgJERKkjBRPR-R0tKbarRKpK08yvXkZlw0AoEXIqKzkr7XE1L"/>
+<span class="font-lexend font-semibold text-slate-400">Luana Torres</span>
+</div>
+<div class="flex gap-2 font-lexend font-medium text-slate-400">
+<span class="w-6 text-center">4</span>
+<span class="w-6 text-center">5</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Component -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 pb-safe bg-white dark:bg-slate-900 border-t rounded-t-lg border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">home</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Início</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-900 dark:text-lime-400 bg-lime-400/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Agenda</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Chaves</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Regras</span>
+</button>
+</nav>
+</body></html>

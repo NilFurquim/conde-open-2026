@@ -11,10 +11,15 @@ import { Match, MatchStatus, TournamentSettings } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
 import {
-  Calendar, Clock, MapPin, MessageCircle, ChevronLeft,
-  CheckCircle2, Edit3, Trophy, AlertCircle, History
+  MessageCircle, ChevronLeft,
+  Trophy, AlertCircle
 } from 'lucide-react';
 import { CATEGORY_COLORS } from '../constants/tournamentData';
+import PlayerName from '../components/PlayerName';
+import CategoryBadge from '../components/CategoryBadge';
+
+const isTBD = (name: string) =>
+  name.includes('º') || name.startsWith('Venc.') || name.startsWith('Melhor');
 
 // ── WhatsApp button ──────────────────────────────────────────────────────────
 const WhatsAppBtn: React.FC<{ playerName: string }> = ({ playerName }) => {
@@ -51,8 +56,8 @@ const SetRow: React.FC<{
   label: string;
   value: string;
   onChange: (v: string) => void;
-  highlight?: boolean;
-}> = ({ label, value, onChange, highlight }) => (
+  emphasized?: boolean;
+}> = ({ label, value, onChange, emphasized }) => (
   <input
     type="number"
     min={0}
@@ -60,7 +65,7 @@ const SetRow: React.FC<{
     value={value}
     onChange={e => onChange(e.target.value)}
     placeholder="–"
-    className={`w-12 h-10 text-center rounded-lg border text-sm font-bold outline-none ${highlight ? 'border-navy-900 bg-navy-900 text-white' : 'border-border-muted bg-slate-50 text-navy-900'}`}
+    className={`w-12 h-10 text-center rounded-lg border border-border-muted text-sm outline-none bg-white ${emphasized ? 'font-bold text-navy-900' : 'font-medium text-slate-600'}`}
   />
 );
 
@@ -73,13 +78,10 @@ const MatchDetail: React.FC = () => {
   const [match, setMatch] = useState<Match | null>(null);
   const [settings, setSettings] = useState<TournamentSettings>({});
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'info' | 'agendar' | 'resultado' | 'historico'>('info');
 
   // Scheduling form
   const [schedDate, setSchedDate] = useState('');
   const [schedTime, setSchedTime] = useState('');
-  const [schedCourt, setSchedCourt] = useState('');
-  const [savingSched, setSavingSched] = useState(false);
 
   // Result form: 3 sets + optional tiebreak each
   const [sets, setSets] = useState([
@@ -88,6 +90,11 @@ const MatchDetail: React.FC = () => {
     { a: '', b: '' },
   ]);
   const [savingResult, setSavingResult] = useState(false);
+  const EMPTY_SETS = [
+    { a: '', b: '' },
+    { a: '', b: '' },
+    { a: '', b: '' },
+  ];
 
   const loadMatch = async () => {
     if (!id) return;
@@ -99,9 +106,14 @@ const MatchDetail: React.FC = () => {
       setSchedDate(format(d, 'yyyy-MM-dd'));
       setSchedTime(format(d, 'HH:mm'));
     }
-    if (m?.court) setSchedCourt(m.court);
     if (m?.score1 && m?.score2) {
-      setSets(m.score1.map((s1, i) => ({ a: String(s1), b: String(m.score2![i] ?? '') })));
+      const nextSets = [0, 1, 2].map(i => ({
+        a: m.score1?.[i] !== undefined ? String(m.score1[i]) : '',
+        b: m.score2?.[i] !== undefined ? String(m.score2[i]) : '',
+      }));
+      setSets(nextSets);
+    } else {
+      setSets(EMPTY_SETS);
     }
   };
 
@@ -128,10 +140,11 @@ const MatchDetail: React.FC = () => {
   }
 
   const playerName = profile?.playerName;
+  const playersDefined = !isTBD(match.p1) && !isTBD(match.p2);
   const isParticipant = !!playerName && match.participants.includes(playerName);
-  const canEdit = !isGuest && (isAdmin || isParticipant);
+  const canEdit = playersDefined && !isGuest && (isAdmin || isParticipant);
   const deadlinePassed = isDeadlinePassed(match, settings, isAdmin);
-  const canEditResult = canEdit && !deadlinePassed;
+  const canEditResult = playersDefined && canEdit && !deadlinePassed;
   const isCompleted = match.status === MatchStatus.COMPLETED;
   const isEditingExisting = isCompleted && canEditResult;
   const catColor = CATEGORY_COLORS[match.category] || CATEGORY_COLORS.A;
@@ -139,45 +152,107 @@ const MatchDetail: React.FC = () => {
   // Opponent's name for WhatsApp
   const opponent = playerName === match.p1 ? match.p2 : match.p1;
 
-  const handleSchedule = async () => {
-    if (!schedDate || !schedTime) { alert('Informe data e hora.'); return; }
-    setSavingSched(true);
-    try {
-      const dt = new Date(`${schedDate}T${schedTime}`);
-      await scheduleMatch(match.id, dt, schedCourt, playerName || 'Admin');
-      await loadMatch();
-      setTab('info');
-    } catch {
-      alert('Erro ao agendar. Tente novamente.');
-    } finally {
-      setSavingSched(false);
+  const handleSave = async () => {
+    const currentSchedDate = match.scheduledAt ? format(match.scheduledAt.toDate(), 'yyyy-MM-dd') : '';
+    const currentSchedTime = match.scheduledAt ? format(match.scheduledAt.toDate(), 'HH:mm') : '';
+    const hasAnySchedInput = schedDate !== '' || schedTime !== '';
+    const hasCompleteSchedInput = schedDate !== '' && schedTime !== '';
+    const hasPartialSchedInput = hasAnySchedInput && !hasCompleteSchedInput;
+    const scheduleChanged = hasCompleteSchedInput &&
+      (schedDate !== currentSchedDate || schedTime !== currentSchedTime);
+
+    if (hasPartialSchedInput) {
+      alert('Preencha data e hora para salvar o agendamento.');
+      return;
     }
-  };
 
-  const handleResult = async () => {
-    const s1 = sets.filter(s => s.a !== '' && s.b !== '');
-    if (s1.length === 0) { alert('Informe pelo menos um set.'); return; }
+    const parsedSets = sets.map(s => {
+      const hasA = s.a !== '';
+      const hasB = s.b !== '';
+      if (!hasA && !hasB) return null;
+      if (!hasA || !hasB) return 'incomplete' as const;
+      return { a: parseInt(s.a) || 0, b: parseInt(s.b) || 0 };
+    });
 
-    const score1 = s1.map(s => parseInt(s.a) || 0);
-    const score2 = s1.map(s => parseInt(s.b) || 0);
-    const winner = determineWinner(match.p1, match.p2, score1, score2);
-    if (!winner) { alert('Resultado empatado em sets. Verifique os scores.'); return; }
+    if (parsedSets.includes('incomplete')) {
+      alert('Preencha os resultados completos de cada set.');
+      return;
+    }
+
+    const lastFilledIdx = parsedSets.reduce((acc, item, idx) => (item ? idx : acc), -1);
+    const hasResultInput = lastFilledIdx >= 0;
+
+    if (hasResultInput) {
+      // Evita "buracos": ex. Set 1 e Tiebreak preenchidos sem Set 2.
+      for (let i = 0; i <= lastFilledIdx; i++) {
+        if (!parsedSets[i]) {
+          alert('Preencha os sets em ordem (Set 1, Set 2 e Tiebreak).');
+          return;
+        }
+      }
+    }
+
+    const filledSets = hasResultInput
+      ? (parsedSets.slice(0, lastFilledIdx + 1) as Array<{ a: number; b: number }>)
+      : [];
+    const score1 = filledSets.map(s => s.a);
+    const score2 = filledSets.map(s => s.b);
+    const winner = hasResultInput ? determineWinner(match.p1, match.p2, score1, score2) : null;
+
+    if (hasResultInput && !winner) {
+      alert('Resultado empatado em sets. Verifique os scores.');
+      return;
+    }
+
+    const sameScoresAsSaved =
+      (match.score1 ?? []).length === score1.length &&
+      (match.score2 ?? []).length === score2.length &&
+      (match.score1 ?? []).every((v, i) => v === score1[i]) &&
+      (match.score2 ?? []).every((v, i) => v === score2[i]);
+    const resultChanged = hasResultInput && (!isCompleted || !sameScoresAsSaved);
+    const canSaveResultNow = resultChanged && canEditResult;
+
+    const hasExistingSchedule = !!match.scheduledAt;
+    if (canSaveResultNow && !hasExistingSchedule && !hasCompleteSchedInput) {
+      alert('Para salvar resultado, informe data e hora do jogo.');
+      return;
+    }
+
+    if (!scheduleChanged && !canSaveResultNow) {
+      alert('Nada para salvar.');
+      return;
+    }
 
     setSavingResult(true);
     try {
-      await saveResult(
-        match.id,
-        match.category,
-        match.round,
-        score1, score2,
-        undefined, undefined,
-        winner,
-        playerName || 'Admin'
-      );
+      if (scheduleChanged) {
+        try {
+          const dt = new Date(`${schedDate}T${schedTime}`);
+          if (!Number.isNaN(dt.getTime())) {
+            await scheduleMatch(match.id, dt, '', playerName || 'Admin');
+          }
+        } catch {
+          // Não bloqueia o salvamento do resultado se o agendamento falhar.
+        }
+      }
+      if (canSaveResultNow && winner) {
+        await saveResult(
+          match.id,
+          match.category,
+          match.round,
+          score1, score2,
+          undefined, undefined,
+          winner,
+          playerName || 'Admin'
+        );
+      }
       await loadMatch();
-      setTab('info');
-    } catch {
-      alert('Erro ao salvar resultado. Tente novamente.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao salvar resultado.';
+      alert(`${message} Tente novamente.`);
+      // Em alguns cenários o resultado pode salvar e falhar apenas no pós-processamento.
+      // Recarrega para refletir o estado real no Firestore.
+      await loadMatch();
     } finally {
       setSavingResult(false);
     }
@@ -187,6 +262,19 @@ const MatchDetail: React.FC = () => {
     ? match.score1.filter((s, i) => s > (match.score2![i] ?? 0)).length : 0;
   const p2Sets = match.score1 && match.score2
     ? match.score2.filter((s, i) => s > (match.score1![i] ?? 0)).length : 0;
+  const scheduledLabel = match.scheduledAt
+    ? format(match.scheduledAt.toDate(), "EEE dd/MM 'às' HH:mm", { locale: ptBR })
+    : null;
+  const filledLiveSets = sets.filter(s => s.a !== '' && s.b !== '');
+  const liveWinner = filledLiveSets.length > 0
+    ? determineWinner(
+      match.p1,
+      match.p2,
+      filledLiveSets.map(s => parseInt(s.a) || 0),
+      filledLiveSets.map(s => parseInt(s.b) || 0)
+    )
+    : null;
+  const visualWinner = liveWinner || match.winner || null;
 
   return (
     <Layout title="Partida">
@@ -196,105 +284,152 @@ const MatchDetail: React.FC = () => {
           <ChevronLeft className="w-4 h-4" />Voltar
         </button>
 
-        {/* Match header */}
-        <div className={`${catColor.light} border ${catColor.border} rounded-2xl p-5`}>
-          <div className="flex items-center gap-2 mb-4">
-            <span className={`${catColor.bg} text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full`}>
-              Cat {match.category}
-            </span>
-            <span className="text-xs text-secondary font-medium">
-              {match.round}{match.group ? ` · Grupo ${match.group}` : ''}
-            </span>
-            <span className={`ml-auto text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${
-              isCompleted ? 'bg-slate-200 text-slate-600' :
-              match.status === MatchStatus.SCHEDULED ? 'bg-green-100 text-green-700' :
-              'bg-amber-100 text-amber-700'
-            }`}>
-              {isCompleted ? 'Finalizado' : match.status === MatchStatus.SCHEDULED ? 'Agendado' : 'Pendente'}
-            </span>
-          </div>
-
-          {/* Scoreboard */}
-          <div className="space-y-3">
-            {[
-              { name: match.p1, score: match.score1, sets: p1Sets },
-              { name: match.p2, score: match.score2, sets: p2Sets },
-            ].map((p, idx) => (
-              <div key={idx} className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`font-lexend font-bold text-base truncate ${match.winner === p.name ? 'text-navy-900' : 'text-on-surface/60'}`}>
-                      {p.name}
-                    </span>
-                    {match.winner === p.name && <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />}
-                  </div>
-                </div>
-                {isCompleted && p.score && (
-                  <div className="flex gap-1 items-center">
-                    {p.score.map((s, i) => (
-                      <span key={i} className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-bold ${match.winner === p.name ? 'bg-navy-900 text-white' : 'bg-white/60 text-slate-500 border border-border-muted'}`}>
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Date/court */}
-          {match.scheduledAt && (
-            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/60 text-secondary">
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span className="text-xs font-semibold">
-                  {format(match.scheduledAt.toDate(), "EEE dd/MM 'às' HH:mm", { locale: ptBR })}
+        {/* Match info */}
+        <div className="space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <CategoryBadge match={match} size="md" />
+            {/* Status badges */}
+            <div className="flex flex-wrap justify-end gap-1">
+              {isCompleted ? (
+                <span className="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">
+                  Finalizado
                 </span>
-              </div>
-              {match.court && (
-                <div className="flex items-center gap-1.5">
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span className="text-xs font-semibold">{match.court}</span>
-                </div>
-              )}
+              ) : null}
             </div>
-          )}
+          </div>
+
+          {/* Unified match view */}
+          <div className="space-y-3.5">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              <div className="flex items-center gap-1.5 justify-start min-w-0">
+                {visualWinner === match.p1 && <Trophy className="w-4 h-4 text-amber-500 shrink-0" />}
+                <PlayerName
+                  name={match.p1}
+                  className={`font-lexend text-xl leading-none text-left ${visualWinner === match.p1 ? 'font-extrabold text-navy-900' : visualWinner === match.p2 ? 'font-medium text-slate-600' : 'font-bold text-on-surface/70'}`}
+                  keepColor={isCompleted && visualWinner === match.p1}
+                  dotSize="md"
+                  dotClassName={visualWinner && visualWinner !== match.p1 ? 'bg-slate-400' : 'bg-primary'}
+                />
+              </div>
+              <span className="text-xs uppercase font-bold text-secondary">vs</span>
+              <div className="flex items-center gap-1.5 justify-end min-w-0">
+                <PlayerName
+                  name={match.p2}
+                  className={`font-lexend text-xl leading-none text-right ${visualWinner === match.p2 ? 'font-extrabold text-navy-900' : visualWinner === match.p1 ? 'font-medium text-slate-600' : 'font-bold text-on-surface/70'}`}
+                  keepColor={isCompleted && visualWinner === match.p2}
+                  dotSize="md"
+                  dotClassName={visualWinner && visualWinner !== match.p2 ? 'bg-slate-400' : 'bg-primary'}
+                />
+                {visualWinner === match.p2 && <Trophy className="w-4 h-4 text-amber-500 shrink-0" />}
+              </div>
+            </div>
+
+            <div className="border-t border-border-muted/70" />
+            {!playersDefined && (
+              <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
+                <p className="text-xs text-amber-800">
+                  Esta partida ainda não tem jogadores definidos nos dois lados.
+                  Agendamento e resultado serão liberados quando ambos forem definidos.
+                </p>
+              </div>
+            )}
+
+            {canEdit ? (
+              <div className="space-y-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-secondary">Horário</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="date"
+                    value={schedDate}
+                    onChange={e => setSchedDate(e.target.value)}
+                    className="w-full border border-border-muted rounded-lg px-3 py-2 text-sm outline-none bg-white"
+                  />
+                  <input
+                    type="time"
+                    value={schedTime}
+                    onChange={e => setSchedTime(e.target.value)}
+                    className="w-full border border-border-muted rounded-lg px-3 py-2 text-sm outline-none bg-white"
+                  />
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs font-semibold text-secondary">Horário: {scheduledLabel ?? 'pendente'}</p>
+            )}
+
+            <div className="space-y-2.5">
+              <p className="text-xs font-bold uppercase tracking-wider text-secondary">Resultado</p>
+              {['Set 1', 'Set 2', 'Tiebreak'].map((setLabel, setIdx) => {
+                const p1Value = sets[setIdx].a;
+                const p2Value = sets[setIdx].b;
+                const p1Score = match.score1?.[setIdx];
+                const p2Score = match.score2?.[setIdx];
+
+                return (
+                  <div key={setLabel} className="grid grid-cols-[48px_1fr_72px_1fr_48px] gap-2.5 items-center">
+                    {canEditResult ? (
+                      <SetRow
+                        label={`p1-${setIdx}`}
+                        value={p1Value}
+                        onChange={v => setSets(prev => prev.map((x, j) => j === setIdx ? { ...x, a: v } : x))}
+                        emphasized={visualWinner === match.p1}
+                      />
+                    ) : (
+                      <span className={`w-12 h-10 flex items-center justify-center rounded-lg text-sm border border-border-muted bg-white ${visualWinner === match.p1 ? 'font-bold text-navy-900' : 'font-medium text-slate-600'}`}>
+                        {typeof p1Score === 'number' ? p1Score : '-'}
+                      </span>
+                    )}
+                    <span />
+                    <span className="text-[11px] uppercase font-bold text-secondary text-center whitespace-nowrap">{setLabel}</span>
+                    <span />
+                    {canEditResult ? (
+                      <SetRow
+                        label={`p2-${setIdx}`}
+                        value={p2Value}
+                        onChange={v => setSets(prev => prev.map((x, j) => j === setIdx ? { ...x, b: v } : x))}
+                        emphasized={visualWinner === match.p2}
+                      />
+                    ) : (
+                      <span className={`w-12 h-10 flex items-center justify-center rounded-lg text-sm border border-border-muted bg-white ${visualWinner === match.p2 ? 'font-bold text-navy-900' : 'font-medium text-slate-600'}`}>
+                        {typeof p2Score === 'number' ? p2Score : '-'}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {isCompleted && (
+              <p className="text-xs font-semibold text-navy-900">
+                Resultado: {match.p1} {p1Sets} x {p2Sets} {match.p2}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* WhatsApp contacts */}
         <div className="space-y-2">
           <p className="text-xs font-bold text-secondary uppercase tracking-wider">Contato</p>
-          <div className="flex flex-wrap gap-2">
-            {match.participants.length > 0 ? (
-              match.participants.slice(0, 4).map(p => <WhatsAppBtn key={p} playerName={p} />)
-            ) : (
-              <>
+          {match.participants.length >= 2 ? (
+            <div className="grid grid-cols-2 gap-3 items-start">
+              <div className="justify-self-start">
+                <WhatsAppBtn playerName={match.participants[0]} />
+              </div>
+              <div className="justify-self-end">
+                <WhatsAppBtn playerName={match.participants[1]} />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 items-start">
+              <div className="justify-self-start">
                 <WhatsAppBtn playerName={match.p1} />
+              </div>
+              <div className="justify-self-end">
                 <WhatsAppBtn playerName={match.p2} />
-              </>
-            )}
-          </div>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Action tabs */}
-        {canEdit && (
-          <div className="flex gap-2 border-b border-border-muted pb-3">
-            {[
-              { key: 'info', label: 'Info' },
-              { key: 'agendar', label: 'Agendar' },
-              ...(canEditResult ? [{ key: 'resultado', label: isCompleted ? 'Editar Resultado' : 'Resultado' }] : []),
-              { key: 'historico', label: 'Histórico' },
-            ].map(t => (
-              <button
-                key={t.key}
-                onClick={() => setTab(t.key as any)}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold border transition-colors ${tab === t.key ? 'bg-navy-900 text-white border-navy-900' : 'bg-white border-border-muted text-secondary'}`}
-              >
-                {t.label}
-              </button>
-            ))}
-          </div>
-        )}
 
         {/* Deadline warning */}
         {deadlinePassed && !isAdmin && (
@@ -304,56 +439,9 @@ const MatchDetail: React.FC = () => {
           </div>
         )}
 
-        {/* Schedule form */}
-        {tab === 'agendar' && canEdit && (
-          <div className="bg-white border border-border-muted rounded-2xl p-5 space-y-4">
-            <h3 className="font-lexend font-bold text-sm text-navy-900">Agendar Partida</h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-semibold text-secondary block mb-1">Data</label>
-                <input
-                  type="date"
-                  value={schedDate}
-                  onChange={e => setSchedDate(e.target.value)}
-                  className="w-full border border-border-muted rounded-xl px-3 py-2.5 text-sm outline-none"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-secondary block mb-1">Hora</label>
-                <input
-                  type="time"
-                  value={schedTime}
-                  onChange={e => setSchedTime(e.target.value)}
-                  className="w-full border border-border-muted rounded-xl px-3 py-2.5 text-sm outline-none"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-secondary block mb-1">Quadra (opcional)</label>
-                <input
-                  type="text"
-                  value={schedCourt}
-                  onChange={e => setSchedCourt(e.target.value)}
-                  placeholder="Ex: Quadra 1"
-                  className="w-full border border-border-muted rounded-xl px-3 py-2.5 text-sm outline-none"
-                />
-              </div>
-            </div>
-            <button
-              onClick={handleSchedule}
-              disabled={savingSched}
-              className="w-full bg-navy-900 text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest disabled:opacity-50"
-            >
-              {savingSched ? 'Salvando...' : 'Confirmar Agendamento'}
-            </button>
-          </div>
-        )}
-
-        {/* Result form */}
-        {tab === 'resultado' && canEditResult && (
-          <div className="bg-white border border-border-muted rounded-2xl p-5 space-y-4">
-            <h3 className="font-lexend font-bold text-sm text-navy-900">
-              {isEditingExisting ? 'Editar Resultado' : 'Registrar Resultado'}
-            </h3>
+        {/* Save action */}
+        {(canEdit || canEditResult) && (
+          <div className="space-y-2.5">
             {isEditingExisting && (
               <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
                 <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
@@ -362,72 +450,16 @@ const MatchDetail: React.FC = () => {
                 </p>
               </div>
             )}
-            <div className="space-y-2">
-              {/* Header */}
-              <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-center mb-1">
-                <span className="text-xs text-secondary font-semibold">Set</span>
-                <span className="w-12 text-center text-xs font-bold text-navy-900 truncate">{match.p1.split(' ')[0]}</span>
-                <span className="w-12 text-center text-xs font-bold text-navy-900 truncate">{match.p2.split(' ')[0]}</span>
-              </div>
-              {sets.map((s, i) => {
-                const a = parseInt(s.a) || 0;
-                const b = parseInt(s.b) || 0;
-                return (
-                  <div key={i} className="grid grid-cols-[1fr_auto_auto] gap-2 items-center">
-                    <span className="text-sm text-secondary font-medium">Set {i + 1}</span>
-                    <SetRow label={`s${i}a`} value={s.a} onChange={v => setSets(prev => prev.map((x, j) => j === i ? { ...x, a: v } : x))} highlight={s.a !== '' && a > b} />
-                    <SetRow label={`s${i}b`} value={s.b} onChange={v => setSets(prev => prev.map((x, j) => j === i ? { ...x, b: v } : x))} highlight={s.b !== '' && b > a} />
-                  </div>
-                );
-              })}
-            </div>
-            <p className="text-xs text-secondary">
-              Vencedor determinado automaticamente pela contagem de sets ganhos.
-            </p>
             <button
-              onClick={handleResult}
+              onClick={handleSave}
               disabled={savingResult}
               className="w-full bg-green-600 text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest disabled:opacity-50"
             >
-              {savingResult ? 'Salvando...' : isEditingExisting ? 'Atualizar Resultado' : 'Salvar Resultado'}
+              {savingResult ? 'Salvando...' : 'Salvar'}
             </button>
           </div>
         )}
 
-        {/* History */}
-        {(tab === 'historico' || (!canEdit && match.history?.length)) && (
-          <div className="bg-white border border-border-muted rounded-2xl p-5 space-y-3">
-            <div className="flex items-center gap-2">
-              <History className="w-4 h-4 text-secondary" />
-              <h3 className="font-lexend font-bold text-sm text-navy-900">Histórico de Edições</h3>
-            </div>
-            {!match.history?.length ? (
-              <p className="text-xs text-secondary">Sem histórico ainda.</p>
-            ) : (
-              <div className="space-y-3">
-                {[...match.history].reverse().map((entry, i) => (
-                  <div key={i} className="border-l-2 border-border-muted pl-3 space-y-0.5">
-                    <p className="text-[10px] text-secondary font-semibold">
-                      {format(entry.timestamp.toDate(), "dd/MM/yyyy HH:mm", { locale: ptBR })} · {entry.updatedBy}
-                    </p>
-                    {entry.action === 'schedule' && entry.scheduledAt && (
-                      <p className="text-xs text-on-surface">
-                        Agendado para {format(entry.scheduledAt.toDate(), "dd/MM 'às' HH:mm", { locale: ptBR })}
-                        {entry.court ? ` · ${entry.court}` : ''}
-                      </p>
-                    )}
-                    {entry.action === 'result' && entry.score1 && (
-                      <p className="text-xs text-on-surface">
-                        Resultado: {entry.score1.join('-')} × {entry.score2?.join('-')}
-                        {entry.winner ? ` · Vencedor: ${entry.winner}` : ''}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </Layout>
   );

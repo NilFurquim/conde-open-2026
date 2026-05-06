@@ -257,10 +257,10 @@ export const saveResult = async (
     updatedBy,
     score1,
     score2,
-    tiebreak1,
-    tiebreak2,
     winner,
     action: 'result',
+    ...(tiebreak1 !== undefined ? { tiebreak1 } : {}),
+    ...(tiebreak2 !== undefined ? { tiebreak2 } : {}),
   };
   const update: Record<string, unknown> = {
     score1,
@@ -276,14 +276,26 @@ export const saveResult = async (
 
   await updateDoc(doc(db, 'matches', matchId), update);
 
-  // Auto-advance bracket
-  if (round === 'Grupos') {
-    await checkAndAdvanceGroupStage(category, updatedBy);
-  } else if (round === 'Play-in') {
-    // Play-in uses the same KO propagation as other KO rounds
-    await propagateKOWinner(matchId, winner, updatedBy);
-  } else {
-    await propagateKOWinner(matchId, winner, updatedBy);
+  // Auto-advance bracket (best effort):
+  // the match result itself is already persisted above and should not be
+  // considered failed if downstream bracket updates hit an edge case.
+  try {
+    if (round === 'Grupos') {
+      await checkAndAdvanceGroupStage(category, updatedBy);
+    } else if (round === 'Play-in') {
+      // Play-in uses the same KO propagation as other KO rounds
+      await propagateKOWinner(matchId, winner, updatedBy);
+    } else {
+      await propagateKOWinner(matchId, winner, updatedBy);
+    }
+  } catch (error) {
+    console.error('[saveResult] Post-processing failed after saving result', {
+      matchId,
+      round,
+      category,
+      winner,
+      error,
+    });
   }
 };
 

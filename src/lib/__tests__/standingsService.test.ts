@@ -172,29 +172,29 @@ describe('computeGroupStandings', () => {
 // ── sortStandings ─────────────────────────────────────────────────────────────
 
 describe('sortStandings', () => {
-  it('sorts by points descending', () => {
+  it('sorts by wins descending', () => {
     const standings = [
-      makeStanding('C', { points: 2 }),
-      makeStanding('A', { points: 6 }),
-      makeStanding('B', { points: 4 }),
+      makeStanding('C', { points: 2, wins: 1 }),
+      makeStanding('A', { points: 6, wins: 3 }),
+      makeStanding('B', { points: 4, wins: 2 }),
     ];
     const sorted = sortStandings(standings);
     expect(sorted.map(s => s.player)).toEqual(['A', 'B', 'C']);
   });
 
-  it('uses sets ratio as secondary tiebreaker when points are equal', () => {
+  it('uses sets ratio as tiebreaker when wins are equal', () => {
     const standings = [
-      makeStanding('X', { points: 2, setsWon: 1, setsLost: 1, matchesPlayed: 1 }),
-      makeStanding('Y', { points: 2, setsWon: 2, setsLost: 0, matchesPlayed: 1 }),
+      makeStanding('X', { points: 2, wins: 1, setsWon: 1, setsLost: 1, matchesPlayed: 1 }),
+      makeStanding('Y', { points: 2, wins: 1, setsWon: 2, setsLost: 0, matchesPlayed: 1 }),
     ];
     const sorted = sortStandings(standings);
     expect(sorted[0].player).toBe('Y'); // better sets ratio
   });
 
-  it('uses games ratio as tertiary tiebreaker', () => {
+  it('uses games ratio when wins and sets ratio tie', () => {
     const standings = [
-      makeStanding('X', { points: 2, setsWon: 1, setsLost: 1, gamesWon: 9, gamesLost: 9, matchesPlayed: 1 }),
-      makeStanding('Y', { points: 2, setsWon: 1, setsLost: 1, gamesWon: 12, gamesLost: 6, matchesPlayed: 1 }),
+      makeStanding('X', { points: 2, wins: 1, setsWon: 1, setsLost: 1, gamesWon: 9, gamesLost: 9, matchesPlayed: 1 }),
+      makeStanding('Y', { points: 2, wins: 1, setsWon: 1, setsLost: 1, gamesWon: 12, gamesLost: 6, matchesPlayed: 1 }),
     ];
     const sorted = sortStandings(standings);
     expect(sorted[0].player).toBe('Y'); // better games ratio
@@ -234,34 +234,34 @@ describe('getBestThirds', () => {
     const input: Record<number, GroupStanding[]> = {};
     for (let g = 1; g <= 6; g++) {
       input[g] = [
-        makeStanding(`${g}A`, { points: 6, group: String(g) }),
-        makeStanding(`${g}B`, { points: 4, group: String(g) }),
-        makeStanding(`${g}C`, { points: g, gamesWon: g * 10, gamesLost: 0, setsWon: g, setsLost: 0, matchesPlayed: 1, group: String(g) }),
-        makeStanding(`${g}D`, { points: 0, group: String(g) }),
+        makeStanding(`${g}A`, { points: 6, wins: 3, group: String(g) }),
+        makeStanding(`${g}B`, { points: 4, wins: 2, group: String(g) }),
+        makeStanding(`${g}C`, { points: g, wins: g, gamesWon: g * 10, gamesLost: 0, setsWon: g, setsLost: 0, matchesPlayed: 1, group: String(g) }),
+        makeStanding(`${g}D`, { points: 0, wins: 0, group: String(g) }),
       ];
     }
     const thirds = getBestThirds(input);
     expect(thirds).toHaveLength(4);
-    // The four best thirds should have the highest points (groups 6,5,4,3)
-    const thirdPoints = thirds.map(s => s.points);
-    expect(Math.min(...thirdPoints)).toBeGreaterThanOrEqual(3);
+    // Os quatro melhores 3ºs por vitórias (grupos 6,5,4,3)
+    const thirdWins = thirds.map(s => s.wins);
+    expect(Math.min(...thirdWins)).toBeGreaterThanOrEqual(3);
   });
 
-  it('sorts thirds by points so the best one comes first', () => {
+  it('sorts thirds by wins so the best one comes first', () => {
     const input = {
       1: [
-        makeStanding('A', { points: 6 }),
-        makeStanding('B', { points: 4 }),
-        makeStanding('C', { points: 2, gamesWon: 5, gamesLost: 5, setsWon: 1, setsLost: 1, matchesPlayed: 1 }),
+        makeStanding('A', { points: 6, wins: 3 }),
+        makeStanding('B', { points: 4, wins: 2 }),
+        makeStanding('C', { points: 2, wins: 1, gamesWon: 5, gamesLost: 5, setsWon: 1, setsLost: 1, matchesPlayed: 1 }),
       ],
       2: [
-        makeStanding('D', { points: 6 }),
-        makeStanding('E', { points: 4 }),
-        makeStanding('F', { points: 4, gamesWon: 10, gamesLost: 2, setsWon: 2, setsLost: 0, matchesPlayed: 1 }),
+        makeStanding('D', { points: 6, wins: 3 }),
+        makeStanding('E', { points: 4, wins: 2 }),
+        makeStanding('F', { points: 4, wins: 2, gamesWon: 10, gamesLost: 2, setsWon: 2, setsLost: 0, matchesPlayed: 1 }),
       ],
     };
     const thirds = getBestThirds(input);
-    expect(thirds[0].player).toBe('F'); // 4 pts > 2 pts
+    expect(thirds[0].player).toBe('F'); // 2 vitórias + melhor saldo que C (1 vitória)
     expect(thirds[1].player).toBe('C');
   });
 });

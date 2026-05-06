@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalhes da Partida - Tennis Local</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&amp;family=Work+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#476083",
+                    "on-tertiary-container": "#646768",
+                    "surface-variant": "#e5e2e1",
+                    "surface": "#fcf9f8",
+                    "secondary-fixed-dim": "#afc8f0",
+                    "on-tertiary-fixed": "#191c1d",
+                    "on-secondary-container": "#445d80",
+                    "surface-container-high": "#ebe7e7",
+                    "outline-variant": "#c0caad",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#467200",
+                    "inverse-primary": "#8bdc00",
+                    "secondary-container": "#bdd6ff",
+                    "inverse-surface": "#313030",
+                    "on-secondary-fixed-variant": "#2f486a",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "secondary-fixed": "#d4e3ff",
+                    "background": "#fcf9f8",
+                    "surface-tint": "#406900",
+                    "on-primary-fixed-variant": "#2f4f00",
+                    "tertiary-fixed": "#e1e3e4",
+                    "primary": "#406900",
+                    "surface-bright": "#fcf9f8",
+                    "primary-fixed-dim": "#8bdc00",
+                    "on-secondary-fixed": "#001c3a",
+                    "surface-container": "#f0edec",
+                    "on-surface-variant": "#414a34",
+                    "tertiary-fixed-dim": "#c5c7c8",
+                    "outline": "#717b61",
+                    "surface-container-highest": "#e5e2e1",
+                    "inverse-on-surface": "#f3f0ef",
+                    "on-primary-fixed": "#102000",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#9ffb00",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#dcd9d9",
+                    "on-background": "#1c1b1b",
+                    "tertiary": "#5c5f60",
+                    "tertiary-container": "#e5e6e7",
+                    "on-surface": "#1c1b1b",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#a2ff00",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3f2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "8px",
+                    "base": "4px",
+                    "lg": "32px",
+                    "gutter": "12px",
+                    "xl": "48px",
+                    "container-margin": "16px",
+                    "md": "24px",
+                    "sm": "16px"
+            },
+            "fontFamily": {
+                    "label-caps": ["Lexend"],
+                    "display-lg": ["Lexend"],
+                    "headline-md": ["Lexend"],
+                    "data-tabular": ["Work Sans"],
+                    "body-md": ["Work Sans"],
+                    "title-sm": ["Lexend"],
+                    "lexend": ["Lexend", "sans-serif"],
+                    "workSans": ["Work Sans", "sans-serif"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "1.0", "fontWeight": "700"}],
+                    "display-lg": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "data-tabular": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .live-pulse {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-color: rgba(162, 255, 0, 1); }
+            50% { border-color: rgba(162, 255, 0, 0.2); }
+            100% { border-color: rgba(162, 255, 0, 1); }
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-28">
+<!-- TopAppBar Components_46 -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm fixed top-0 w-full z-50 flex justify-between items-center px-4 h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-900 dark:text-lime-400 text-2xl" data-icon="sports_tennis">sports_tennis</span>
+<h1 class="font-lexend font-bold text-lg tracking-tight text-slate-900 dark:text-white">Detalhes da Partida</h1>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant active:scale-95 transition-transform duration-150">
+<img alt="Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/a/ACg8ocIW_B_8LpM-Yw2p_8ZJ8Z-Y7I8q-2_R6S7S-Z5R7S-Z5R7S=s96-c"/>
+</div>
+</div>
+</header>
+<main class="pt-20 px-4 space-y-6">
+<!-- Tournament Badge & Stage -->
+<div class="flex items-center justify-between">
+<div class="bg-primary-container/20 px-3 py-1 rounded-lg border border-primary-container">
+<span class="font-label-caps text-label-caps text-on-primary-container">CATEGORIA A</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container live-pulse border border-primary"></span>
+<span class="font-label-caps text-label-caps text-tertiary">QUARTAS DE FINAL</span>
+</div>
+</div>
+<!-- Match Card -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl p-gutter shadow-sm overflow-hidden relative">
+<div class="absolute top-0 left-0 h-full w-1.5 bg-primary-container"></div>
+<div class="flex flex-col gap-6">
+<!-- Players Head-to-Head -->
+<div class="flex items-center justify-between gap-4">
+<!-- Player 1 -->
+<div class="flex flex-col items-center flex-1 text-center space-y-2">
+<div class="relative">
+<img alt="Jogador 1" class="w-20 h-20 rounded-full object-cover border-4 border-surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_Qd-D_o87QA7dOC2GyD0ZzMw-Z5F7L5U5nAfirxjwL0Wth7zMOzjdYIyCwClL1SgwwUWsNK4j6uvAv1-S1j3SeHy0xQgpdnKGfwJtoJz54dapDlJgUw6lqk-5z6IiFI9AZI4VvHLTz4gxE3ZktGcLb-8oULbfwFdEx5-zikLJCJ_LMWHxIRp3szIE6NkbPoWV1-rXeT2vR2cbmtYf95gKxVOYKA2ajF3T92YGvqBslSfa3i_K9NS9yfTeOF7vIhDn0qGy7rB1OnuB"/>
+<div class="absolute -bottom-1 -right-1 bg-primary-container rounded-full w-6 h-6 flex items-center justify-center border-2 border-surface">
+<span class="text-[10px] font-bold text-on-primary-fixed">1</span>
+</div>
+</div>
+<h2 class="font-title-sm text-title-sm text-on-surface leading-tight">Ricardo Silva</h2>
+</div>
+<!-- VS Divider -->
+<div class="flex flex-col items-center">
+<div class="text-on-surface-variant font-black italic text-2xl">VS</div>
+</div>
+<!-- Player 2 -->
+<div class="flex flex-col items-center flex-1 text-center space-y-2">
+<div class="relative">
+<img alt="Jogador 2" class="w-20 h-20 rounded-full object-cover border-4 border-surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIgG7iu-xBRvpG4ETvGDI3lL3fgfYbLMEsRR-4HqLwlhFcSip5N6PKSQwVp9NKcU4V6cqWuJnfVQGUWn0plxdVRPzcZwtsArMr9ltWj3V-6Nib207o5X7jiGeJ6i474nFwy4S4xroJC8cUSy79YTT4my2LRq0diMV2ckYGi2J6_Sr2K35FeCE3IbETAUB8MSgvYSOdiEcKgiJpGNPZiI5Jpo-6_p2Dah0UdViHz_i42dIuNpDOGEyClNnNrcAFHi6QN4MareyZf-dC"/>
+</div>
+<h2 class="font-title-sm text-title-sm text-on-surface leading-tight">André Costa</h2>
+</div>
+</div>
+<!-- Match Info -->
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-surface-variant">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="calendar_today">calendar_today</span>
+<div>
+<p class="text-[10px] font-label-caps text-on-surface-variant uppercase">Data e Hora</p>
+<p class="text-data-tabular font-data-tabular text-on-surface">Amanhã, 19:30</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="location_on">location_on</span>
+<div>
+<p class="text-[10px] font-label-caps text-on-surface-variant uppercase">Local</p>
+<p class="text-data-tabular font-data-tabular text-on-surface">Quadra 4</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Score Section -->
+<section class="space-y-3">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant tracking-wider uppercase">Placar da Partida</h3>
+<!-- Waiting State -->
+<div class="bg-surface-container-low rounded-xl p-8 border-2 border-dashed border-outline-variant flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-outline text-4xl mb-2" data-icon="sports_tennis">sports_tennis</span>
+<p class="font-title-sm text-title-sm text-on-surface-variant">Aguardando Resultado</p>
+<p class="text-body-md font-body-md text-tertiary mt-1">A partida ainda não foi iniciada ou o placar não foi registrado.</p>
+</div>
+</section>
+<!-- Action Buttons -->
+<section class="space-y-4 pt-4">
+<button class="w-full bg-primary-container text-on-primary-fixed py-4 rounded-xl font-lexend font-extrabold text-lg flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                Registrar/Editar Resultado
+            </button>
+<button class="w-full border-2 border-secondary text-secondary py-3.5 rounded-xl font-lexend font-bold text-md flex items-center justify-center gap-2 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+                Mandar Mensagem
+            </button>
+<div class="flex justify-center pt-2">
+<button class="text-tertiary font-body-md text-sm underline underline-offset-4 active:opacity-60 transition-opacity">
+                    Concluir Partida Manualmente (WO)
+                </button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Components_46 -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 pb-safe bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] rounded-t-lg">
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Início</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Agenda</span>
+</div>
+<!-- Active link simulated (assuming Placar flow for Match Details) -->
+<div class="flex flex-col items-center justify-center text-slate-900 dark:text-lime-400 bg-lime-400/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Chaves</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200 cursor-pointer">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Regras</span>
+</div>
+</nav>
+</body></html>

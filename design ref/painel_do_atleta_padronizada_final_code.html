@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;family=Work+Sans:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#476083",
+                        "on-tertiary-container": "#646768",
+                        "surface-variant": "#e5e2e1",
+                        "surface": "#fcf9f8",
+                        "secondary-fixed-dim": "#afc8f0",
+                        "on-tertiary-fixed": "#191c1d",
+                        "on-secondary-container": "#445d80",
+                        "surface-container-high": "#ebe7e7",
+                        "outline-variant": "#c0caad",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#467200",
+                        "inverse-primary": "#8bdc00",
+                        "secondary-container": "#bdd6ff",
+                        "inverse-surface": "#313030",
+                        "on-secondary-fixed-variant": "#2f486a",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d4e3ff",
+                        "background": "#fcf9f8",
+                        "surface-tint": "#406900",
+                        "on-primary-fixed-variant": "#2f4f00",
+                        "tertiary-fixed": "#e1e3e4",
+                        "primary": "#406900",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed-dim": "#8bdc00",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-container": "#f0edec",
+                        "on-surface-variant": "#414a34",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "outline": "#717b61",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-primary-fixed": "#102000",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#9ffb00",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dcd9d9",
+                        "on-background": "#1c1b1b",
+                        "tertiary": "#5c5f60",
+                        "tertiary-container": "#e5e6e7",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#a2ff00",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f6f3f2",
+                        "navy-900": "#001c3a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "base": "4px",
+                        "lg": "32px",
+                        "gutter": "12px",
+                        "xl": "48px",
+                        "container-margin": "16px",
+                        "md": "24px",
+                        "sm": "16px"
+                    },
+                    "fontFamily": {
+                        "lexend": ["Lexend", "sans-serif"],
+                        "workSans": ["Work Sans", "sans-serif"],
+                        "label-caps": ["Lexend"],
+                        "display-lg": ["Lexend"],
+                        "headline-md": ["Lexend"],
+                        "data-tabular": ["Work Sans"],
+                        "body-md": ["Work Sans"],
+                        "title-sm": ["Lexend"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "1.0", "fontWeight": "700"}],
+                        "display-lg": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "data-tabular": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                }
+            }
+        };
+    </script>
+<style>
+        body { font-family: 'Work Sans', sans-serif; background-color: #fcf9f8; }
+        .font-lexend { font-family: 'Lexend', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-background text-on-background pb-28">
+<!-- TopAppBar standardized -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center px-4 h-16 w-full fixed top-0 z-50 shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-900 dark:text-lime-400 font-black text-xl">sports_tennis</span>
+<h1 class="font-lexend font-bold text-lg tracking-tight text-slate-900 dark:text-white">Início</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="Foto do Perfil" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVtJAGSQTtk5vLfF6_jmYnR07Gi1JTBqtsI9fD8w2llW4yLiQT11_bKcD_lCV1drFlkBFYrYSlA5eqJsVs3wdLIYaCmNQRyAGmLptOgjCy31PrQgnXc4lvoP3Su7becCRynhJrs61ZvUp3HH-x9Pd00yDU6Q9WnpTuA8shwc_lOd987-xJWfvaaKojyoFrn-NYUGBXLsyTXPbURxQnpv6No8IkPVE_pVDulfaTrEKGyd4JG2-RVZmTwCGl70Ai5etsdukXiOd9fi7k"/>
+</div>
+</header>
+<main class="mt-20 px-container-margin space-y-lg">
+<!-- Category Filters -->
+<section class="flex gap-xs overflow-x-auto py-2 no-scrollbar">
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full bg-primary text-on-primary font-lexend text-label-caps uppercase tracking-wider">Todos</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant font-lexend text-label-caps uppercase tracking-wider hover:bg-primary-container transition-colors">Cat A</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant font-lexend text-label-caps uppercase tracking-wider hover:bg-primary-container transition-colors">Duplas</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant font-lexend text-label-caps uppercase tracking-wider hover:bg-primary-container transition-colors">Cat B</button>
+<button class="flex-shrink-0 px-4 py-1.5 rounded-full bg-surface-container-highest text-on-surface-variant font-lexend text-label-caps uppercase tracking-wider hover:bg-primary-container transition-colors">Master</button>
+</section>
+<!-- Pendências Section -->
+<section class="space-y-sm">
+<div class="flex justify-between items-center">
+<h2 class="font-lexend text-title-sm text-navy-900 uppercase tracking-tight">Pendências</h2>
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded text-[10px] font-bold">2 AÇÕES</span>
+</div>
+<div class="space-y-gutter">
+<!-- Pendency: Scheduling -->
+<div class="bg-white border border-slate-100 rounded-xl p-md shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-primary-container text-on-primary-container font-lexend text-[10px] px-3 py-1 font-bold rounded-bl-lg">DUPLAS</div>
+<div class="space-y-xs">
+<div class="flex items-center gap-1 text-error font-lexend text-label-caps">
+<span class="material-symbols-outlined text-[14px]">event_busy</span>
+<span>AGENDAR ATÉ 15/10</span>
+</div>
+<div class="flex flex-col gap-2 py-xs">
+<div class="flex justify-between items-center border-b border-slate-50 pb-2">
+<span class="font-lexend font-bold text-navy-900">M. Silva / R. Souza</span>
+<span class="text-slate-300 font-bold">VS</span>
+<span class="font-lexend font-bold text-navy-900 italic">Oponente pendente</span>
+</div>
+</div>
+<div class="flex gap-2 pt-2">
+<button class="flex-1 bg-primary text-on-primary font-lexend font-bold py-2.5 rounded-lg text-sm active:scale-95 transition-transform">Confirmar Horário</button>
+<button class="px-3 border-2 border-navy-900 text-navy-900 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pendency: Results -->
+<div class="bg-white border border-slate-100 rounded-xl p-md shadow-sm relative overflow-hidden border-l-4 border-l-primary-container">
+<div class="absolute top-0 right-0 bg-surface-container-highest text-on-surface-variant font-lexend text-[10px] px-3 py-1 font-bold rounded-bl-lg">CAT A</div>
+<div class="space-y-xs">
+<div class="flex items-center gap-1 text-secondary font-lexend text-label-caps">
+<span class="material-symbols-outlined text-[14px]">history</span>
+<span>PARTIDA ENCERRADA ONTEM</span>
+</div>
+<div class="py-xs">
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-lexend font-bold text-navy-900">Rodrigo Faro</span>
+<span class="font-lexend font-bold text-navy-900">Você</span>
+</div>
+<div class="bg-slate-50 rounded p-2 text-center">
+<span class="font-lexend font-black text-navy-900 text-lg">? : ?</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-navy-900 text-lime-400 font-lexend font-bold py-2.5 rounded-lg text-sm uppercase tracking-widest active:scale-95 transition-transform">Registrar Resultado</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Seus Próximos Jogos -->
+<section class="space-y-sm">
+<h2 class="font-lexend text-title-sm text-navy-900 uppercase tracking-tight">Seus Próximos Jogos</h2>
+<div class="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm">
+<div class="bg-navy-900 px-4 py-2 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="bg-lime-400 text-navy-900 px-2 py-0.5 rounded text-[10px] font-black">AMANHÃ</span>
+<span class="text-white font-lexend text-label-caps">19:30 • QUADRA 04</span>
+</div>
+<span class="text-lime-400 font-lexend text-[10px] font-bold">CAT B</span>
+</div>
+<div class="p-md space-y-md">
+<div class="flex items-center justify-between">
+<div class="flex flex-col items-center gap-1 w-5/12">
+<div class="w-12 h-12 rounded-full border-2 border-primary-container p-0.5">
+<img alt="Sua foto" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzawiS_KooXjQAFRssl8IEIoD3QAUZZdMeLB1ZZvRDiSulvgPLDtl-EuXWqNJBFhvioQRMTMzrI5EuIfseCxX7E3XgL8dVepE3cIBWCfUyrJQgWGTUl8d7pcHbQ_Bf6Q5RydiVE-6JHntYdWB-WDMgsQBgiqfn6VZd5R2o3fyOf9GL5flB6JcaWOJ_FIcwxotxy0zUiDwExvNGtGBzn3FG6QmC1DrVQhBGPGysi1QjOzC5heGG7J1wlfoECWycQK3dBs2PMk2TvsgQ"/>
+</div>
+<span class="font-lexend font-bold text-sm text-center">Você</span>
+</div>
+<span class="font-lexend font-black text-slate-200 text-xl">VS</span>
+<div class="flex flex-col items-center gap-1 w-5/12">
+<div class="w-12 h-12 rounded-full border-2 border-slate-200 p-0.5">
+<img alt="Oponente" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5ltCOVdeRkQFucORr4kMQXF0hCIYdA0wk8ntfaeFC9togyUUIVm73mr4ukaGDtoL6EtHqNsapVf0Tf8vSD1TOa-slH_9Ex0OTcriO-yHMTIk1LTNSlzxzixZXB9IEh5T-MsAOGEFTe8d_eHOyoL9qxh4cp95LvibG68PPG-RirRs2QIi0XlUNmnLCBPAXZ5e_X04prsDvWyi_n1_lMrk_Tn_3w55f9an-A6o3Z0N-QMxQWmTtpSuQvSwnKMApavqGvhhO99mpswBq"/>
+</div>
+<span class="font-lexend font-bold text-sm text-center">L. Mendonça</span>
+</div>
+</div>
+<button class="w-full border-2 border-navy-900 text-navy-900 font-lexend font-bold py-2 rounded-lg text-sm active:bg-slate-50 transition-colors">Ver Detalhes do Local</button>
+</div>
+</div>
+</section>
+<!-- Torneio (Geral) -->
+<section class="space-y-sm pb-10">
+<h2 class="font-lexend text-title-sm text-navy-900 uppercase tracking-tight">Torneio (Geral)</h2>
+<div class="space-y-gutter">
+<!-- Live Score Card -->
+<div class="bg-white border border-slate-100 rounded-xl p-md shadow-sm relative overflow-hidden border-l-4 border-l-primary">
+<div class="flex justify-between items-start mb-xs">
+<div class="flex items-center gap-1.5">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-ping"></span>
+<span class="text-primary font-lexend text-label-caps font-black">AO VIVO</span>
+<span class="text-slate-400 font-lexend text-label-caps ml-2">Q3 • 2º SET</span>
+</div>
+<span class="bg-surface-container-highest text-on-surface-variant font-lexend text-[10px] px-2 py-0.5 rounded font-bold">MASTER</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-lexend font-bold text-navy-900">G. Kuerten</span>
+<div class="flex gap-2">
+<span class="bg-slate-100 text-navy-900 font-lexend font-bold px-2 py-0.5 rounded text-sm">6</span>
+<span class="bg-primary-container text-on-primary-container font-lexend font-bold px-2 py-0.5 rounded text-sm">4</span>
+</div>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-lexend text-slate-500">F. Meligeni</span>
+<div class="flex gap-2">
+<span class="bg-slate-100 text-slate-400 font-lexend font-bold px-2 py-0.5 rounded text-sm">4</span>
+<span class="bg-slate-50 text-slate-400 font-lexend font-bold px-2 py-0.5 rounded text-sm">2</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Finished Match -->
+<div class="bg-surface-container-low border border-slate-200 rounded-xl p-md relative overflow-hidden opacity-80">
+<div class="flex justify-between items-start mb-xs">
+<span class="text-slate-400 font-lexend text-label-caps">FINALIZADO</span>
+<span class="bg-slate-200 text-slate-600 font-lexend text-[10px] px-2 py-0.5 rounded font-bold">CAT A</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="font-lexend font-bold text-navy-900">D. Thiem</span>
+<span class="material-symbols-outlined text-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-lexend font-bold text-navy-900">6 6</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-lexend text-slate-500">N. Kyrgios</span>
+<span class="font-lexend text-slate-500">2 3</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB GREEN to schedule -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform z-40 border-4 border-white">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+<!-- BottomNavBar standardized -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 pb-safe bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] rounded-t-lg">
+<button class="flex flex-col items-center justify-center text-slate-900 dark:text-lime-400 bg-lime-400/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Início</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Agenda</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Chaves</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Regras</span>
+</button>
+</nav>
+</body></html>

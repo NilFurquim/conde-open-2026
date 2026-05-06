@@ -7,6 +7,9 @@ import Agenda from './pages/Agenda';
 import Brackets from './pages/Brackets';
 import Rules from './pages/Rules';
 import MatchDetail from './pages/MatchDetail';
+import Admin from './pages/Admin';
+import Stats from './pages/Stats';
+import Profile from './pages/Profile';
 
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile, loading, isGuest } = useAuth();
@@ -27,7 +30,11 @@ export default function App() {
           <Route path="/agenda" element={<PrivateRoute><Agenda /></PrivateRoute>} />
           <Route path="/chaves" element={<PrivateRoute><Brackets /></PrivateRoute>} />
           <Route path="/regras" element={<PrivateRoute><Rules /></PrivateRoute>} />
+          <Route path="/stats" element={<PrivateRoute><Stats /></PrivateRoute>} />
+          <Route path="/estatisticas" element={<PrivateRoute><Stats /></PrivateRoute>} />
           <Route path="/match/:id" element={<PrivateRoute><MatchDetail /></PrivateRoute>} />
+          <Route path="/perfil" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>

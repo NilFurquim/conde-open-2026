@@ -1,92 +1,25 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { fetchAllMatches } from '../lib/matchService';
-import { Match, MatchStatus, Category } from '../types';
+import { Match, MatchStatus } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 import Layout from '../components/Layout';
-import { Clock, CheckCircle2, AlertCircle, Calendar, Search } from 'lucide-react';
-import { CATEGORY_COLORS, ROUND_ORDER } from '../constants/tournamentData';
+import SearchableParticipantCombobox from '../components/SearchableParticipantCombobox';
+import { ROUND_ORDER, type CategoryFilterKey } from '../constants/tournamentData';
+import CategoryFilterStrip from '../components/CategoryFilterStrip';
+import {
+  PendingScheduleCard,
+  ScheduledMatchCard,
+  CompletedMatchCard,
+  isVisuallyFinished,
+} from './Home';
 
-const CATS: Array<'Todos' | Category> = ['Todos', 'A', 'B', 'C', 'Duplas'];
-const STATUSES = ['Todos', 'Pendentes', 'Agendados', 'Finalizados'] as const;
+// "Todos" = só agendados + finalizados (jogos com data, fechados ou em jogo)
+// Pendentes ficam por último, num filtro dedicado
+const STATUSES = ['Todos', 'Agendados', 'Finalizados', 'Pendentes'] as const;
 type StatusFilter = typeof STATUSES[number];
 
 const isTBD = (name: string) => name.includes('º') || name.startsWith('Venc.') || name.startsWith('Melhor');
-
-const StatusBadge: React.FC<{ status: MatchStatus }> = ({ status }) => {
-  if (status === MatchStatus.COMPLETED) return (
-    <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
-      <CheckCircle2 className="w-2.5 h-2.5" />Finalizado
-    </span>
-  );
-  if (status === MatchStatus.SCHEDULED) return (
-    <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-      <Clock className="w-2.5 h-2.5" />Agendado
-    </span>
-  );
-  return (
-    <span className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
-      <AlertCircle className="w-2.5 h-2.5" />Pendente
-    </span>
-  );
-};
-
-const MatchItem: React.FC<{ match: Match; playerName?: string; onClick: () => void }> = ({ match, playerName, onClick }) => {
-  const catColor = CATEGORY_COLORS[match.category] || CATEGORY_COLORS.A;
-  const isMyMatch = playerName && match.participants.includes(playerName);
-
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full text-left bg-white rounded-2xl p-4 active:bg-slate-50 transition-colors border ${isMyMatch ? catColor.border + ' border-l-4' : 'border-border-muted'}`}
-    >
-      <div className="flex items-center justify-between mb-2.5">
-        <div className="flex items-center gap-2">
-          <span className={`${catColor.bg} text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full`}>
-            {match.category}
-          </span>
-          <span className="text-[10px] text-secondary font-medium">
-            {match.round}{match.group ? ` · G${match.group}` : ''}{match.matchNum ? ` · J${match.matchNum}` : ''}
-          </span>
-        </div>
-        <StatusBadge status={match.status} />
-      </div>
-      <div className="space-y-1.5">
-        <div className="flex justify-between items-center">
-          <span className={`text-sm font-semibold ${match.winner === match.p1 ? 'text-navy-900' : 'text-on-surface/70'}`}>{match.p1}</span>
-          {match.score1 && (
-            <div className="flex gap-1">
-              {match.score1.map((s, i) => (
-                <span key={i} className={`w-6 h-6 flex items-center justify-center rounded text-xs font-bold ${match.winner === match.p1 ? 'bg-navy-900 text-white' : 'bg-slate-100 text-slate-500'}`}>{s}</span>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="flex justify-between items-center">
-          <span className={`text-sm font-semibold ${match.winner === match.p2 ? 'text-navy-900' : 'text-on-surface/70'}`}>{match.p2}</span>
-          {match.score2 && (
-            <div className="flex gap-1">
-              {match.score2.map((s, i) => (
-                <span key={i} className={`w-6 h-6 flex items-center justify-center rounded text-xs font-bold ${match.winner === match.p2 ? 'bg-navy-900 text-white' : 'bg-slate-100 text-slate-500'}`}>{s}</span>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      {match.scheduledAt && (
-        <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-border-muted">
-          <Calendar className="w-3 h-3 text-secondary" />
-          <span className="text-[10px] text-secondary font-semibold">
-            {format(match.scheduledAt.toDate(), "EEE dd/MM 'às' HH:mm", { locale: ptBR })}
-            {match.court ? ` · ${match.court}` : ''}
-          </span>
-        </div>
-      )}
-    </button>
-  );
-};
 
 const FilterPill: React.FC<{ active: boolean; onClick: () => void; children: React.ReactNode }> = ({ active, onClick, children }) => (
   <button
@@ -102,9 +35,11 @@ const Agenda: React.FC = () => {
   const { profile, isGuest } = useAuth();
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [catFilter, setCatFilter] = useState<'Todos' | Category>('Todos');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Todos');
-  const [search, setSearch] = useState('');
+  const [catFilter, setCatFilter] = useState<CategoryFilterKey>('TODOS');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('Agendados');
+  const [participantKey, setParticipantKey] = useState('');
+  const [participantQuery, setParticipantQuery] = useState('');
+  const [participantDropdownOpen, setParticipantDropdownOpen] = useState(false);
   const [myOnly, setMyOnly] = useState(false);
 
   const playerName = profile?.playerName;
@@ -113,36 +48,74 @@ const Agenda: React.FC = () => {
     fetchAllMatches().then(setAllMatches).finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    setParticipantKey('');
+    setParticipantQuery('');
+    setParticipantDropdownOpen(false);
+  }, [catFilter]);
+
+  const participantOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const m of allMatches) {
+      if (isTBD(m.p1) || isTBD(m.p2)) continue;
+      if (catFilter !== 'TODOS' && m.category !== catFilter) continue;
+      set.add(m.p1);
+      set.add(m.p2);
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  }, [allMatches, catFilter]);
+
   const filtered = useMemo(() => {
     let ms = allMatches.filter(m => !isTBD(m.p1) && !isTBD(m.p2));
-    if (catFilter !== 'Todos') ms = ms.filter(m => m.category === catFilter);
-    if (statusFilter === 'Pendentes') ms = ms.filter(m => m.status === MatchStatus.PENDING);
-    else if (statusFilter === 'Agendados') ms = ms.filter(m => m.status === MatchStatus.SCHEDULED);
-    else if (statusFilter === 'Finalizados') ms = ms.filter(m => m.status === MatchStatus.COMPLETED);
+    if (catFilter !== 'TODOS') ms = ms.filter(m => m.category === catFilter);
+
+    if (statusFilter === 'Todos') {
+      // "Todos" = jogos com data definida (agendados ou finalizados); pendentes ficam fora
+      ms = ms.filter(m => m.status !== MatchStatus.PENDING);
+    } else if (statusFilter === 'Pendentes') ms = ms.filter(m => m.status === MatchStatus.PENDING);
+    else if (statusFilter === 'Agendados') ms = ms.filter(m => m.status === MatchStatus.SCHEDULED && !isVisuallyFinished(m));
+    else if (statusFilter === 'Finalizados') ms = ms.filter(m => m.status === MatchStatus.COMPLETED || isVisuallyFinished(m));
+
     if (myOnly && playerName) ms = ms.filter(m => m.participants.includes(playerName));
-    if (search.trim()) {
-      const t = search.toLowerCase();
+    if (participantKey) {
+      ms = ms.filter(
+        m =>
+          m.p1 === participantKey ||
+          m.p2 === participantKey ||
+          m.participants.includes(participantKey),
+      );
+    } else if (participantQuery.trim()) {
+      const t = participantQuery.toLowerCase();
       ms = ms.filter(m => m.p1.toLowerCase().includes(t) || m.p2.toLowerCase().includes(t));
     }
+    const byDateAsc = (a: Match, b: Match) =>
+      (a.scheduledAt?.toMillis() ?? Number.MAX_SAFE_INTEGER) - (b.scheduledAt?.toMillis() ?? Number.MAX_SAFE_INTEGER);
+
+    if (statusFilter === 'Agendados') {
+      // Mais próximo primeiro.
+      return ms.sort(byDateAsc);
+    }
+    if (statusFilter === 'Finalizados') {
+      // Mais antigo para mais novo.
+      return ms.sort(byDateAsc);
+    }
+
+    // Pendentes/Todos: mantém leitura por fase do torneio.
     return ms.sort((a, b) => {
       const ao = ROUND_ORDER[a.round] ?? 0;
       const bo = ROUND_ORDER[b.round] ?? 0;
       if (ao !== bo) return ao - bo;
       return (a.matchNum ?? 0) - (b.matchNum ?? 0);
     });
-  }, [allMatches, catFilter, statusFilter, search, myOnly, playerName]);
+  }, [allMatches, catFilter, statusFilter, participantKey, participantQuery, myOnly, playerName]);
 
   const pendingCount = allMatches.filter(m => m.status === MatchStatus.PENDING && !isTBD(m.p1)).length;
 
   return (
     <Layout title="Agenda">
       <div className="space-y-4">
-        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-          {CATS.map(c => (
-            <FilterPill key={c} active={catFilter === c} onClick={() => setCatFilter(c)}>
-              {c === 'Todos' ? 'Todos' : `Cat ${c}`}
-            </FilterPill>
-          ))}
+        <div className="-mx-1 px-1">
+          <CategoryFilterStrip value={catFilter} onChange={setCatFilter} />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
           {STATUSES.map(s => (
@@ -151,21 +124,27 @@ const Agenda: React.FC = () => {
             </FilterPill>
           ))}
         </div>
-        <div className="flex gap-2">
-          <div className="flex-1 flex items-center gap-2 bg-white border border-border-muted rounded-xl px-3">
-            <Search className="w-4 h-4 text-secondary shrink-0" />
-            <input
-              type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Buscar jogador..."
-              className="flex-1 py-2.5 text-sm outline-none bg-transparent"
+        <div className="flex gap-2 items-center">
+          <div className="min-w-0 flex-1">
+            <SearchableParticipantCombobox
+              id="agenda-participant-combo"
+              listBoxId="agenda-participant-combo-list"
+              allOptionLabel="Todos"
+              options={participantOptions}
+              selectedKey={participantKey}
+              comboQuery={participantQuery}
+              dropdownOpen={participantDropdownOpen}
+              placeholder="Todos ou digite para filtrar…"
+              onDropdownOpenChange={setParticipantDropdownOpen}
+              onSelectedKeyChange={setParticipantKey}
+              onComboQueryChange={setParticipantQuery}
             />
           </div>
           {!isGuest && playerName && (
             <button
+              type="button"
               onClick={() => setMyOnly(v => !v)}
-              className={`px-3 py-2 rounded-xl text-xs font-bold border transition-colors ${myOnly ? 'bg-navy-900 text-white border-navy-900' : 'bg-white border-border-muted text-secondary'}`}
+              className={`shrink-0 px-3 py-2.5 rounded-xl text-xs font-bold border transition-colors ${myOnly ? 'bg-navy-900 text-white border-navy-900' : 'bg-white border-border-muted text-secondary'}`}
             >
               Meus
             </button>
@@ -182,7 +161,13 @@ const Agenda: React.FC = () => {
           <div className="space-y-2">
             <p className="text-xs text-secondary">{filtered.length} partida{filtered.length !== 1 ? 's' : ''}</p>
             {filtered.map(m => (
-              <MatchItem key={m.id} match={m} playerName={playerName} onClick={() => navigate(`/match/${m.id}`)} />
+              m.status === MatchStatus.PENDING ? (
+                <PendingScheduleCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+              ) : (m.status === MatchStatus.COMPLETED || isVisuallyFinished(m)) ? (
+                <CompletedMatchCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+              ) : (
+                <ScheduledMatchCard key={m.id} match={m} onClick={() => navigate(`/match/${m.id}`)} />
+              )
             ))}
           </div>
         )}

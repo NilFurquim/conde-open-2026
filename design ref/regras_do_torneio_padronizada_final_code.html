@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&amp;family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#476083",
+                        "on-tertiary-container": "#646768",
+                        "surface-variant": "#e5e2e1",
+                        "surface": "#fcf9f8",
+                        "secondary-fixed-dim": "#afc8f0",
+                        "on-tertiary-fixed": "#191c1d",
+                        "on-secondary-container": "#445d80",
+                        "surface-container-high": "#ebe7e7",
+                        "outline-variant": "#c0caad",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#467200",
+                        "inverse-primary": "#8bdc00",
+                        "secondary-container": "#bdd6ff",
+                        "inverse-surface": "#313030",
+                        "on-secondary-fixed-variant": "#2f486a",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d4e3ff",
+                        "background": "#fcf9f8",
+                        "surface-tint": "#406900",
+                        "on-primary-fixed-variant": "#2f4f00",
+                        "tertiary-fixed": "#e1e3e4",
+                        "primary": "#406900",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed-dim": "#8bdc00",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-container": "#f0edec",
+                        "on-surface-variant": "#414a34",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "outline": "#717b61",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-primary-fixed": "#102000",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#9ffb00",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dcd9d9",
+                        "on-background": "#1c1b1b",
+                        "tertiary": "#5c5f60",
+                        "tertiary-container": "#e5e6e7",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#a2ff00",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f6f3f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "base": "4px",
+                        "lg": "32px",
+                        "gutter": "12px",
+                        "xl": "48px",
+                        "container-margin": "16px",
+                        "md": "24px",
+                        "sm": "16px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["lexend"],
+                        "display-lg": ["lexend"],
+                        "headline-md": ["lexend"],
+                        "data-tabular": ["workSans"],
+                        "body-md": ["workSans"],
+                        "title-sm": ["lexend"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "1.0", "fontWeight": "700"}],
+                        "display-lg": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "data-tabular": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopAppBar Standardized -->
+<header class="bg-white dark:bg-slate-900 fixed top-0 w-full z-50 border-b border-slate-100 dark:border-slate-800 shadow-sm flex justify-between items-center px-4 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-900 dark:text-lime-400 font-black text-xl" data-icon="sports_tennis" style="font-variation-settings: 'FILL' 1;">sports_tennis</span>
+<h1 class="font-lexend font-bold text-lg tracking-tight text-slate-900 dark:text-white">Regras</h1>
+</div>
+<div class="active:scale-95 transition-transform duration-150">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-outline-variant">
+<span class="material-symbols-outlined text-slate-400" data-icon="person">person</span>
+</div>
+</div>
+</header>
+<main class="pt-20 px-container-margin max-w-2xl mx-auto">
+<!-- Hero Section -->
+<div class="mb-lg relative rounded-xl overflow-hidden bg-on-secondary-fixed h-48 flex flex-col justify-end p-sm border-b-4 border-primary-fixed">
+<img class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-overlay" data-alt="Action shot of a tennis ball on court" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDt11JuVYE4ZzybjzOfv49MiZRi4oh8NyDzuC-ftQUfkqLA19seaQZsfQTzjKrTgfbFXj3ntcPU_HRbUq6r-VkjRPy8kHiFvTJ83son2l6ZCFlGHrN_S1Dq2NRzkyHFc9y7T_dci4VMNY3Mnssltqa0OsgKQMKgmbo0vu_YuZErbDnl7-61C-nl_g52tEoNxWle5kpPw3vjAvDZUVyZOfTok9YJ0OwHo_9CRnODcCLa1yEV0vAr5vi82Os3ooJP3JKyKYHcMGxH0Nkw"/>
+<div class="relative z-10">
+<span class="font-label-caps text-label-caps text-primary-fixed mb-base block uppercase tracking-widest">Torneio Local 2024</span>
+<h2 class="font-display-lg text-display-lg text-white">Regras do Torneio</h2>
+</div>
+</div>
+<!-- Rules Content -->
+<div class="space-y-gutter">
+<!-- Section: Registro Obrigatório -->
+<section class="bg-primary-container/10 rounded-xl border border-primary/20 overflow-hidden shadow-sm p-sm flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="app_registration">app_registration</span>
+<p class="font-title-sm text-sm text-on-primary-container">Todas as partidas devem ser registradas obrigatoriamente no aplicativo.</p>
+</section>
+<!-- Section: Formato da Competição -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm">
+<div class="p-sm flex items-center gap-sm border-b border-outline-variant/10 bg-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="format_list_numbered">format_list_numbered</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Formato da Competição</h3>
+</div>
+<div class="p-sm space-y-sm">
+<div class="flex gap-sm">
+<div class="w-1 bg-primary rounded-full"></div>
+<div>
+<p class="font-title-sm text-[14px] text-on-surface">Sets Curtos</p>
+<p class="font-body-md text-sm text-on-surface-variant">2 sets de 4 games, com Super Tie-break (10 pontos) em caso de empate em sets.</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<div class="w-1 bg-primary rounded-full"></div>
+<div>
+<p class="font-title-sm text-[14px] text-on-surface">Empate no Set (4-4)</p>
+<p class="font-body-md text-sm text-on-surface-variant">Caso o set atinja 4-4, será disputado um Super Tie-break (10 pontos).</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: Critérios de Desempate -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm">
+<div class="p-sm flex items-center gap-sm border-b border-outline-variant/10 bg-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="sort">sort</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Critérios de Desempate</h3>
+</div>
+<div class="p-sm">
+<ul class="space-y-xs">
+<li class="flex items-center justify-between py-xs border-b border-outline-variant/10">
+<span class="font-body-md text-sm text-on-surface-variant">1. Número de Vitórias</span>
+<span class="bg-primary text-white px-xs py-base rounded-lg font-label-caps text-[10px]">PRIORIDADE 1</span>
+</li>
+<li class="flex items-center justify-between py-xs border-b border-outline-variant/10">
+<span class="font-body-md text-sm text-on-surface-variant">2. Confronto Direto</span>
+<span class="bg-surface-variant text-on-surface-variant px-xs py-base rounded-lg font-label-caps text-[10px]">PRIORIDADE 2</span>
+</li>
+<li class="flex items-center justify-between py-xs border-b border-outline-variant/10">
+<span class="font-body-md text-sm text-on-surface-variant">3. Saldo de Sets</span>
+<span class="bg-surface-variant text-on-surface-variant px-xs py-base rounded-lg font-label-caps text-[10px]">PRIORIDADE 3</span>
+</li>
+<li class="flex items-center justify-between py-xs">
+<span class="font-body-md text-sm text-on-surface-variant">4. Saldo de Games</span>
+<span class="bg-surface-variant text-on-surface-variant px-xs py-base rounded-lg font-label-caps text-[10px]">PRIORIDADE 4</span>
+</li>
+</ul>
+</div>
+</section>
+<!-- Section: Código de Conduta -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm">
+<div class="p-sm flex items-center gap-sm border-b border-outline-variant/10 bg-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="gavel">gavel</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Código de Conduta</h3>
+</div>
+<div class="p-sm space-y-sm">
+<ul class="space-y-sm">
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="check_circle">check_circle</span>
+<div>
+<p class="font-title-sm text-[14px] text-on-surface">Autogestão de placar</p>
+<p class="font-body-md text-sm text-on-surface-variant">Jogadores são responsáveis por cantar o placar de forma clara.</p>
+</div>
+</li>
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="verified">verified</span>
+<div>
+<p class="font-title-sm text-[14px] text-on-surface">Expectativa de honestidade</p>
+<p class="font-body-md text-sm text-on-surface-variant">Fair play absoluto em chamadas de linha e marcações duvidosas.</p>
+</div>
+</li>
+<li class="flex gap-sm">
+<span class="material-symbols-outlined text-primary text-sm mt-1" data-icon="handshake">handshake</span>
+<div>
+<p class="font-title-sm text-[14px] text-on-surface">Respeito mútuo</p>
+<p class="font-body-md text-sm text-on-surface-variant">Manter uma conduta cordial durante e após os jogos.</p>
+</div>
+</li>
+</ul>
+</div>
+</section>
+<!-- Section: Prazos de Agendamento -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm">
+<div class="p-sm flex items-center gap-sm border-b border-outline-variant/10 bg-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="event_available">event_available</span>
+<h3 class="font-title-sm text-title-sm text-on-surface">Prazos de Agendamento</h3>
+</div>
+<div class="p-sm">
+<div class="mb-sm bg-surface-container p-sm rounded-lg border-l-4 border-primary">
+<p class="font-label-caps text-[10px] text-primary uppercase mb-base">Prazo dos jogos</p>
+<p class="font-body-md text-sm text-on-surface">Cada fase terá um prazo definido de 7 dias por rodada. Caso o jogo não aconteça dentro do prazo, será avaliado quem teve mais iniciativa para marcar (WO).</p>
+</div>
+<p class="mt-sm font-body-md text-xs text-on-surface-variant italic text-center">
+                        *Agendamentos fora do prazo devem ser aprovados pela comissão técnica.
+                    </p>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar Standardized -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 pb-safe bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 rounded-t-lg shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Início</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Agenda</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 hover:text-slate-600 dark:hover:text-lime-300 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Chaves</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-900 dark:text-lime-400 bg-lime-400/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="menu_book" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider">Regras</span>
+</button>
+</nav>
+</body></html>

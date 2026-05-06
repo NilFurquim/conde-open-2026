@@ -8,9 +8,8 @@
  * Isso garante que os conectores SVG (cotovelo elbow path) chegam
  * exatamente ao centro de cada card, independente de zoom ou viewport.
  *
- * Para adicionar highlight do jogador logado, passe `highlightPlayer` ao
- * componente. O KOMatchCard recebe o mesmo prop e pode usá-lo para
- * estilizar os nomes do jogador.
+ * O highlight do jogador logado é feito automaticamente pelo `PlayerName`
+ * usado dentro do `KOMatchCard` (via `useAuth`).
  */
 import React, { useMemo } from 'react';
 import { Match } from '../types';
@@ -91,9 +90,7 @@ const BracketFlow: React.FC<{
   columns: BracketColumnDef[];
   matches: Match[];
   onMatch: (m: Match) => void;
-  /** Futuro: nome do jogador logado para highlight */
-  highlightPlayer?: string;
-}> = ({ columns, matches, onMatch, highlightPlayer }) => {
+}> = ({ columns, matches, onMatch }) => {
   // Connections relevant to this layout
   const connections = useMemo(() => {
     const all = new Set(columns.flatMap(c => c.groups.flat()));
@@ -148,7 +145,6 @@ const BracketFlow: React.FC<{
                     match={displayMatch}
                     onClick={() => onMatch(displayMatch)}
                     subtle={!fromDb}
-                    highlightPlayer={highlightPlayer}
                   />
                 </div>
               );

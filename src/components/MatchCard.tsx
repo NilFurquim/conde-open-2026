@@ -1,9 +1,11 @@
 import React from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, MapPin, CheckCircle, Clock } from 'lucide-react';
+import { MapPin, CheckCircle, Clock } from 'lucide-react';
 import { Match, MatchStatus } from '../types';
 import { useNavigate } from 'react-router-dom';
+import PlayerName from './PlayerName';
+import CategoryBadge from './CategoryBadge';
 
 const MatchCard: React.FC<{ match: Match }> = ({ match }) => {
   const navigate = useNavigate();
@@ -22,15 +24,8 @@ const MatchCard: React.FC<{ match: Match }> = ({ match }) => {
       <div className={`absolute left-0 top-0 h-full w-1.5 ${isCompleted ? 'bg-border-muted' : 'bg-primary-container'}`}></div>
       
       <div className="p-5">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex items-center gap-2">
-            <span className="bg-surface px-3 py-1 rounded-full text-navy-900 font-bold text-[9px] uppercase tracking-wider border border-border-muted">
-              {match.category}
-            </span>
-            <span className="text-secondary font-lexend text-[10px] font-bold uppercase tracking-widest opacity-60">
-              {match.round}
-            </span>
-          </div>
+        <div className="flex justify-between items-start mb-4 gap-2">
+          <CategoryBadge match={match} />
           {isCompleted ? (
             <span className="bg-surface px-2 py-0.5 rounded text-secondary font-bold text-[9px] uppercase tracking-tighter">FINALIZADO</span>
           ) : isScheduled ? (
@@ -42,10 +37,12 @@ const MatchCard: React.FC<{ match: Match }> = ({ match }) => {
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <span className={`font-lexend text-base tracking-tight ${match.winner === match.p1 ? 'text-navy-900 font-extrabold' : 'text-on-surface opacity-70 font-medium'}`}>
-                {match.p1}
-              </span>
+            <div className="flex items-center gap-3 min-w-0">
+              <PlayerName
+                name={match.p1}
+                className={`font-lexend text-base tracking-tight ${match.winner === match.p1 ? 'text-navy-900 font-extrabold' : 'text-on-surface opacity-70 font-medium'}`}
+                keepColor={isCompleted && match.winner === match.p1}
+              />
               {match.winner === match.p1 && <CheckCircle className="w-4 h-4 text-primary-container fill-primary" />}
             </div>
             <div className="flex gap-1.5">
@@ -56,10 +53,12 @@ const MatchCard: React.FC<{ match: Match }> = ({ match }) => {
           </div>
 
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <span className={`font-lexend text-base tracking-tight ${match.winner === match.p2 ? 'text-navy-900 font-extrabold' : 'text-on-surface opacity-70 font-medium'}`}>
-                {match.p2}
-              </span>
+            <div className="flex items-center gap-3 min-w-0">
+              <PlayerName
+                name={match.p2}
+                className={`font-lexend text-base tracking-tight ${match.winner === match.p2 ? 'text-navy-900 font-extrabold' : 'text-on-surface opacity-70 font-medium'}`}
+                keepColor={isCompleted && match.winner === match.p2}
+              />
               {match.winner === match.p2 && <CheckCircle className="w-4 h-4 text-primary-container fill-primary" />}
             </div>
             <div className="flex gap-1.5">

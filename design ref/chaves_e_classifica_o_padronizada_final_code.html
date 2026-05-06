@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Torneios - Chaves e Classificação</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&amp;family=Work+Sans:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#476083",
+                        "on-tertiary-container": "#646768",
+                        "surface-variant": "#e5e2e1",
+                        "surface": "#fcf9f8",
+                        "secondary-fixed-dim": "#afc8f0",
+                        "on-tertiary-fixed": "#191c1d",
+                        "on-secondary-container": "#445d80",
+                        "surface-container-high": "#ebe7e7",
+                        "outline-variant": "#c0caad",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#467200",
+                        "inverse-primary": "#8bdc00",
+                        "secondary-container": "#bdd6ff",
+                        "inverse-surface": "#313030",
+                        "on-secondary-fixed-variant": "#2f486a",
+                        "on-tertiary-fixed-variant": "#454748",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d4e3ff",
+                        "background": "#fcf9f8",
+                        "surface-tint": "#406900",
+                        "on-primary-fixed-variant": "#2f4f00",
+                        "tertiary-fixed": "#e1e3e4",
+                        "primary": "#406900",
+                        "surface-bright": "#fcf9f8",
+                        "primary-fixed-dim": "#8bdc00",
+                        "on-secondary-fixed": "#001c3a",
+                        "surface-container": "#f0edec",
+                        "on-surface-variant": "#414a34",
+                        "tertiary-fixed-dim": "#c5c7c8",
+                        "outline": "#717b61",
+                        "surface-container-highest": "#e5e2e1",
+                        "inverse-on-surface": "#f3f0ef",
+                        "on-primary-fixed": "#102000",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#9ffb00",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#dcd9d9",
+                        "on-background": "#1c1b1b",
+                        "tertiary": "#5c5f60",
+                        "tertiary-container": "#e5e6e7",
+                        "on-surface": "#1c1b1b",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#a2ff00",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f6f3f2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "8px",
+                        "base": "4px",
+                        "lg": "32px",
+                        "gutter": "12px",
+                        "xl": "48px",
+                        "container-margin": "16px",
+                        "md": "24px",
+                        "sm": "16px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["lexend"],
+                        "display-lg": ["lexend"],
+                        "headline-md": ["lexend"],
+                        "data-tabular": ["workSans"],
+                        "body-md": ["workSans"],
+                        "title-sm": ["lexend"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", {"lineHeight": "1.0", "fontWeight": "700"}],
+                        "display-lg": ["40px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "data-tabular": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { min-height: max(884px, 100dvh); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md selection:bg-primary-container">
+<!-- TopAppBar -->
+<header class="bg-white dark:bg-slate-900 fixed top-0 w-full z-50 border-b border-slate-100 dark:border-slate-800 shadow-sm flex justify-between items-center px-4 h-16">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-2xl" data-icon="sports_tennis">sports_tennis</span>
+<h1 class="text-slate-900 dark:text-white font-lexend font-bold text-lg tracking-tight uppercase">Chaves</h1>
+</div>
+<div class="active:scale-95 transition-transform duration-150">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden border border-outline-variant">
+<span class="material-symbols-outlined text-on-surface-variant text-xl">person</span>
+</div>
+</div>
+</header>
+<main class="pt-16 pb-24">
+<!-- Category Filters -->
+<section class="py-sm overflow-x-auto no-scrollbar flex gap-xs px-container-margin bg-white/50 backdrop-blur-sm sticky top-16 z-40 border-b border-surface-container-highest">
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-primary-container text-on-primary-container font-label-caps text-label-caps transition-all active:scale-95">Cat A</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container transition-all">Cat B</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container transition-all">Cat C</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container transition-all">Feminino</button>
+<button class="whitespace-nowrap px-md py-xs rounded-full bg-surface-container-highest text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container transition-all">Duplas</button>
+</section>
+<!-- Secondary Navigation (Tabs) -->
+<nav class="flex w-full px-container-margin mt-sm">
+<div class="flex w-full bg-surface-container-low rounded-xl p-1">
+<button class="flex-1 py-xs rounded-lg bg-white shadow-sm text-on-surface font-title-sm text-title-sm text-center transition-all">Classificação</button>
+<button class="flex-1 py-xs rounded-lg text-secondary font-title-sm text-title-sm text-center transition-all">Mata-mata</button>
+</div>
+</nav>
+<!-- Standings Content -->
+<div class="px-container-margin mt-md space-y-md">
+<!-- Group 1 -->
+<div class="bg-white rounded-xl border border-surface-container overflow-hidden shadow-sm">
+<div class="bg-surface-container-low px-sm py-xs border-b border-surface-container flex justify-between items-center">
+<h3 class="font-headline-md text-title-sm text-primary uppercase tracking-wider">Grupo 1</h3>
+<span class="text-label-caps font-label-caps text-secondary">4 Atletas</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-bright border-b border-surface-container">
+<th class="px-sm py-xs font-label-caps text-[10px] text-secondary uppercase">Atleta</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">P</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">V</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">D</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">S</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-sm py-sm flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="font-data-tabular text-data-tabular text-on-background font-bold">R. Federer</span>
+</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular font-bold">9</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">3</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">0</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular text-primary font-bold">+18</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-sm py-sm flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="font-data-tabular text-data-tabular text-on-background">R. Nadal</span>
+</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular font-bold">6</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">2</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">1</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular text-primary font-bold">+12</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-sm py-sm flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-surface-container-highest"></div>
+<span class="font-data-tabular text-data-tabular text-on-background">N. Djokovic</span>
+</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular font-bold">3</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">1</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">2</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular text-error font-bold">-4</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Group 2 -->
+<div class="bg-white rounded-xl border border-surface-container overflow-hidden shadow-sm">
+<div class="bg-surface-container-low px-sm py-xs border-b border-surface-container flex justify-between items-center">
+<h3 class="font-headline-md text-title-sm text-primary uppercase tracking-wider">Grupo 2</h3>
+<span class="text-label-caps font-label-caps text-secondary">4 Atletas</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-bright border-b border-surface-container">
+<th class="px-sm py-xs font-label-caps text-[10px] text-secondary uppercase">Atleta</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">P</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">V</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">D</th>
+<th class="px-xs py-xs font-label-caps text-[10px] text-center text-secondary uppercase">S</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container">
+<tr class="hover:bg-surface-container-lowest transition-colors">
+<td class="px-sm py-sm flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-primary-container"></div>
+<span class="font-data-tabular text-data-tabular text-on-background font-bold">J. Sinner</span>
+</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular font-bold">6</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">2</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular">0</td>
+<td class="px-xs py-sm text-center font-data-tabular text-data-tabular text-primary font-bold">+10</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Layout for Brackets (Knockout) -->
+<div class="mt-xl px-container-margin pb-10 opacity-40">
+<h2 class="font-headline-md text-headline-md mb-md text-on-background">Próxima Fase: Mata-mata</h2>
+<div class="flex overflow-x-auto gap-lg pb-md no-scrollbar">
+<!-- Round: Quarters -->
+<div class="min-w-[200px] space-y-lg relative">
+<div class="font-label-caps text-label-caps text-secondary mb-xs text-center border-b pb-1">Quartas</div>
+<div class="bg-white border rounded-lg p-2 shadow-sm">
+<div class="flex justify-between border-b pb-1 border-surface-container"><span class="font-bold">Federer</span><span>2</span></div>
+<div class="flex justify-between pt-1"><span>Medvedev</span><span>0</span></div>
+</div>
+<div class="bg-white border rounded-lg p-2 shadow-sm">
+<div class="flex justify-between border-b pb-1 border-surface-container"><span>Sinner</span><span>1</span></div>
+<div class="flex justify-between pt-1"><span class="font-bold">Nadal</span><span>2</span></div>
+</div>
+</div>
+<!-- Round: Semis -->
+<div class="min-w-[200px] flex flex-col justify-center space-y-xl">
+<div class="font-label-caps text-label-caps text-secondary mb-xs text-center border-b pb-1">Semis</div>
+<div class="bg-white border-2 border-primary-container rounded-lg p-2 shadow-md">
+<div class="flex justify-between border-b pb-1 border-surface-container"><span class="font-bold">Federer</span><span>-</span></div>
+<div class="flex justify-between pt-1"><span class="font-bold">Nadal</span><span>-</span></div>
+</div>
+</div>
+<!-- Round: Final -->
+<div class="min-w-[200px] flex flex-col justify-center">
+<div class="font-label-caps text-label-caps text-primary mb-xs text-center border-b border-primary-container pb-1">Final</div>
+<div class="bg-primary-container/10 border-2 border-primary-container border-dashed rounded-lg p-4 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="emoji_events">emoji_events</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] pb-safe rounded-t-lg">
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider mt-1">Início</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider mt-1">Agenda</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-900 dark:text-lime-400 bg-lime-400/10 rounded-xl px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider mt-1">Chaves</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-3 py-1 active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-lexend text-[10px] font-semibold uppercase tracking-wider mt-1">Regras</span>
+</div>
+</footer>
+</body></html>

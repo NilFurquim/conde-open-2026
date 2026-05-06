@@ -1,33 +1,55 @@
 import React from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Calendar, Trophy, BookOpen, User } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Calendar, Trophy, BookOpen, BarChart2, User } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
+function initialsFromName(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(w => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
+
 const Layout: React.FC<{ children: React.ReactNode; title: string }> = ({ children, title }) => {
-  const { profile, isGuest, logout } = useAuth();
+  const { profile, isGuest } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/login');
-  };
+  const handleTitleClick = () => navigate('/');
+  const handleProfileClick = () => navigate('/perfil');
+
+  const headerName = profile?.playerName ?? (isGuest ? 'Convidado' : '');
 
   return (
-    <div className="min-h-screen flex flex-col bg-surface pb-24">
+    <div className="flex min-h-screen flex-col bg-surface pb-[4.5rem] sm:pb-[4.75rem]">
       {/* Top App Bar */}
-      <header className="bg-white sticky top-0 z-50 border-b border-border-muted shadow-sm flex justify-between items-center px-4 h-16 w-full">
-        <button onClick={handleLogout} className="flex items-center gap-3 active:scale-95 transition-transform text-left">
-          <Trophy className="w-5 h-5 text-navy-900" />
-          <h1 className="font-lexend font-bold text-lg tracking-tight text-navy-900">{title}</h1>
+      <header className="bg-white sticky top-0 z-50 border-b border-border-muted shadow-sm flex min-h-16 justify-between items-center gap-2 px-3 sm:px-4 py-2 w-full">
+        <button type="button" onClick={handleTitleClick} className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 active:scale-95 transition-transform text-left">
+          <Trophy className="w-5 h-5 shrink-0 text-navy-900" />
+          <h1 className="font-lexend min-w-0 truncate font-bold text-base sm:text-lg tracking-tight text-navy-900">{title}</h1>
         </button>
-        <button onClick={handleLogout} className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary active:scale-95 transition-transform">
-          {profile ? (
-            <img src={profile.photoURL} alt="Foto do Perfil" className="w-full h-full object-cover" />
-          ) : (
-             <div className="w-full h-full bg-surface flex items-center justify-center">
-               <User className="w-5 h-5 text-secondary" />
-             </div>
+        <button
+          type="button"
+          onClick={handleProfileClick}
+          className="flex max-w-[55%] shrink-0 items-center gap-2 rounded-xl py-1 pl-2 pr-1 active:scale-95 transition-transform sm:gap-2.5 sm:pl-2.5"
+          title="Abrir perfil"
+        >
+          {headerName && (
+            <span className="font-lexend min-w-0 truncate text-right text-xs font-semibold leading-tight text-navy-900 sm:text-sm">
+              {headerName}
+            </span>
           )}
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-primary bg-slate-100">
+            {profile?.photoURL ? (
+              <img src={profile.photoURL} alt="" className="h-full w-full object-cover" />
+            ) : profile?.playerName ? (
+              <span className="font-lexend text-[11px] font-bold text-navy-900">{initialsFromName(profile.playerName)}</span>
+            ) : (
+              <User className="h-5 w-5 text-secondary" aria-hidden />
+            )}
+          </div>
         </button>
       </header>
 
@@ -36,32 +58,42 @@ const Layout: React.FC<{ children: React.ReactNode; title: string }> = ({ childr
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 h-20 bg-white border-t border-slate-100 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] rounded-t-lg">
+      <nav className="fixed bottom-0 left-0 z-50 flex h-16 w-full items-stretch justify-between gap-0 border-t border-slate-100 bg-white px-1 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] sm:h-[4.25rem] sm:px-2">
         <NavItem to="/" icon={<Home />} label="Início" />
         <NavItem to="/agenda" icon={<Calendar />} label="Agenda" />
         <NavItem to="/chaves" icon={<Trophy />} label="Chaves" />
+        <NavItem to="/stats" icon={<BarChart2 />} label="Estatísticas" />
         <NavItem to="/regras" icon={<BookOpen />} label="Regras" />
       </nav>
     </div>
   );
 };
 
-const NavItem = ({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) => (
-  <NavLink
-    to={to}
-    className={({ isActive }) =>
-      `flex flex-col items-center justify-center px-3 py-1 active:scale-90 transition-all duration-200 ${
-        isActive ? 'text-navy-900 bg-primary/20 rounded-xl' : 'text-slate-400 hover:text-slate-600'
-      }`
-    }
-  >
-    {({ isActive }) => (
-      <>
-        {React.cloneElement(icon as React.ReactElement, { className: `w-6 h-6 ${isActive ? 'fill-current' : ''}` })}
-        <span className="font-lexend text-[10px] font-semibold uppercase tracking-wider mt-1">{label}</span>
-      </>
-    )}
-  </NavLink>
-);
+const NavItem = ({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) => {
+  const { pathname } = useLocation();
+  const isActive = to === '/' ? pathname === '/' : pathname === to;
+
+  return (
+    <Link
+      to={to}
+      className={`flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center py-1.5 active:opacity-80 ${
+        isActive ? 'text-navy-900' : 'text-slate-400 hover:text-slate-600'
+      }`}
+    >
+      <span
+        className={`inline-flex max-w-full flex-col items-center justify-center gap-0.5 rounded-lg px-1.5 py-1 sm:px-2 ${
+          isActive ? 'bg-primary/18' : ''
+        }`}
+      >
+        {React.cloneElement(icon as React.ReactElement, {
+          className: `h-[22px] w-[22px] shrink-0 sm:h-6 sm:w-6 ${isActive ? 'text-navy-900' : ''}`,
+        })}
+        <span className="line-clamp-2 h-8 max-w-[3.1rem] text-center font-lexend text-[7px] font-semibold uppercase leading-[1.05] tracking-tight text-current sm:max-w-[3.35rem] sm:text-[8px]">
+          {label}
+        </span>
+      </span>
+    </Link>
+  );
+};
 
 export default Layout;
