@@ -58,7 +58,7 @@ const Layout: React.FC<{ children: React.ReactNode; title: string }> = ({ childr
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 z-50 flex h-16 w-full items-stretch justify-between gap-0 border-t border-slate-100 bg-white px-1 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] sm:h-[4.25rem] sm:px-2">
+      <nav className="fixed bottom-0 left-0 z-50 flex h-16 w-full items-center justify-between gap-0 border-t border-slate-100 bg-white px-1 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] sm:h-[4.25rem] sm:px-2">
         <NavItem to="/" icon={<Home />} label="Início" />
         <NavItem to="/agenda" icon={<Calendar />} label="Agenda" />
         <NavItem to="/chaves" icon={<Trophy />} label="Chaves" />
@@ -76,19 +76,19 @@ const NavItem = ({ to, icon, label }: { to: string; icon: React.ReactNode; label
   return (
     <Link
       to={to}
-      className={`flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center py-1.5 active:opacity-80 ${
+      className={`flex min-h-0 min-w-0 flex-1 flex-col items-center justify-center py-0.5 active:opacity-80 ${
         isActive ? 'text-navy-900' : 'text-slate-400 hover:text-slate-600'
       }`}
     >
       <span
-        className={`inline-flex max-w-full flex-col items-center justify-center gap-0.5 rounded-lg px-1.5 py-1 sm:px-2 ${
+        className={`inline-flex max-w-full flex-col items-center justify-center gap-0.5 rounded-md px-2 py-0.5 sm:px-2.5 sm:py-0.5 ${
           isActive ? 'bg-primary/18' : ''
         }`}
       >
         {React.cloneElement(icon as React.ReactElement, {
           className: `h-[22px] w-[22px] shrink-0 sm:h-6 sm:w-6 ${isActive ? 'text-navy-900' : ''}`,
         })}
-        <span className="line-clamp-2 h-8 max-w-[3.1rem] text-center font-lexend text-[7px] font-semibold uppercase leading-[1.05] tracking-tight text-current sm:max-w-[3.35rem] sm:text-[8px]">
+        <span className="max-w-[4.2rem] truncate whitespace-nowrap text-center font-lexend text-[7px] font-semibold uppercase leading-none tracking-normal text-current sm:max-w-[4.4rem] sm:text-[8px]">
           {label}
         </span>
       </span>
